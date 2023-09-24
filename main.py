@@ -4,6 +4,8 @@ from models.clazz import Clazz
 from models.config import Config
 from models.course import Course
 from models.distribution import Distribution
+from models.optimization import Optimization
+from models.problem import Problem
 from models.room import Room
 from models.roomOption import RoomOption
 from models.student import Student
@@ -97,6 +99,25 @@ def parse_xml(file_path):
         for course in courses_elem.findall("course")
     ]
 
+    optimization_elem = root.find("optimization")
+    optimization = Optimization(
+        optimization_elem.get("time"),
+        optimization_elem.get("room"),
+        optimization_elem.get("distribution"),
+        optimization_elem.get("student")
+    )
+
+    problem = Problem(
+        root.get("name"),
+        root.get("nrDays"),
+        root.get("slotsPerDay"),
+        root.get("nrWeeks"),
+        optimization,
+        rooms,
+        courses,
+        distributions,
+        students
+    )
 
     return problem
 
