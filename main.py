@@ -1,5 +1,7 @@
 import xml.etree.ElementTree as ET
 
+import numpy as np
+
 from models.clazz import Clazz
 from models.config import Config
 from models.course import Course
@@ -101,17 +103,17 @@ def parse_xml(file_path):
 
     optimization_elem = root.find("optimization")
     optimization = Optimization(
-        optimization_elem.get("time"),
-        optimization_elem.get("room"),
-        optimization_elem.get("distribution"),
-        optimization_elem.get("student")
+        int(optimization_elem.get("time")),
+        int(optimization_elem.get("room")),
+        int(optimization_elem.get("distribution")),
+        int(optimization_elem.get("student"))
     )
 
     problem = Problem(
         root.get("name"),
-        root.get("nrDays"),
-        root.get("slotsPerDay"),
-        root.get("nrWeeks"),
+        int(root.get("nrDays")),
+        int(root.get("slotsPerDay")),
+        int(root.get("nrWeeks")),
         optimization,
         rooms,
         courses,
@@ -121,7 +123,29 @@ def parse_xml(file_path):
 
     return problem
 
+def random_gene(problem:Problem,maximums):
+    return (np.random.rand(*maximums.shape)*maximums).astype(int)
+
+def get_gene_maximums(problem:Problem):
+    classes:list[Clazz] = []
+
+    for course in problem.courses:
+        for conf in course.configs:
+            for sp in conf.subparts:
+                classes += sp.classes
+
+    geneMaximums = [
+        (len(c.room_options),len(c.time_options))
+        for c in classes
+    ]
+
+    return np.array(geneMaximums)
 
 if __name__ == "__main__":
     file_path = "input.xml"
     problem = parse_xml(file_path)
+
+    maximumGenes = get_gene_maximums(problem)
+    print(maximumGenes)
+    rand = random_gene(problem, maximumGenes)
+    print(rand)
