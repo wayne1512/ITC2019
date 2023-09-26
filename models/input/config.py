@@ -1,4 +1,4 @@
-from models.subpart import Subpart
+from models.input.subpart import Subpart
 
 
 class Config:

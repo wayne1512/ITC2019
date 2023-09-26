@@ -1,8 +1,8 @@
-from models.course import Course
-from models.distribution import Distribution
-from models.optimization import Optimization
-from models.room import Room
-from models.student import Student
+from models.input.course import Course
+from models.input.distribution import Distribution
+from models.input.optimization import Optimization
+from models.input.room import Room
+from models.input.student import Student
 
 
 class Problem:

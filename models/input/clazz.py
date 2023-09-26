@@ -1,5 +1,5 @@
-from models.roomOption import RoomOption
-from models.timeOption import TimeOption
+from models.input.roomOption import RoomOption
+from models.input.timeOption import TimeOption
 
 
 class Clazz:

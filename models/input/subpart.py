@@ -1,4 +1,4 @@
-from models.clazz import Clazz
+from models.input.clazz import Clazz
 
 
 class Subpart:

@@ -1,4 +1,4 @@
-from models.config import Config
+from models.input.config import Config
 
 
 class Course:
