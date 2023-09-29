@@ -10,8 +10,7 @@ if __name__ == "__main__":
 
     maximumGenes = get_gene_maximums(classes)
     print(maximumGenes)
-    for _ in range(1000000):
+    for _ in range(100):
         rand = random_gene(problem, maximumGenes)
+        calculate_total_penalty(problem, classes, rand)
     print(rand)
-
-    calculate_total_penalty(classes, rand)

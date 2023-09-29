@@ -26,9 +26,9 @@ def random_gene(problem: Problem, maximums):
 
 
 def get_gene_maximums(classes: list[Clazz]):
-    geneMaximums = [
+    gene_maximums = [
         (len(c.room_options) - 1, len(c.time_options) - 1)  # possible -1 for those who dont need a room
         for c in classes
     ]
 
-    return np.array(geneMaximums)
+    return np.array(gene_maximums)
