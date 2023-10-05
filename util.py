@@ -32,3 +32,7 @@ def get_gene_maximums(classes: list[Clazz]):
     ]
 
     return np.array(gene_maximums)
+
+
+def sum_of_costs(n):
+    return tuple(np.array(n).sum(0))
