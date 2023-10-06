@@ -1,7 +1,6 @@
 import numpy as np
 
 from models.input.clazz import Clazz
-from models.input.problem import Problem
 
 
 def bool_string_to_bool_arr(s):
@@ -19,7 +18,7 @@ def extract_class_list(problem):
     return classes
 
 
-def random_gene(problem: Problem, maximums):
+def random_gene(maximums):
     r = (np.random.rand(*maximums.shape) * (maximums + 1)).astype(int)
     r = np.where(maximums < 0, -1, r)
     return r
