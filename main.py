@@ -1,7 +1,7 @@
 import matplotlib.pyplot as plt
 import numpy as np
 
-from basicGenetic import generate_new_population_basic_genetic
+from basicGenetic import generate_new_population_roulette_wheel
 from parseInput import parse_xml
 from penaltyCalc import calculate_total_cost
 from util import extract_class_list, random_gene, get_gene_maximums
@@ -28,7 +28,7 @@ if __name__ == "__main__":
         if population is None:
             population = [random_gene(maximumGenes) for _ in range(population_size)]
         else:
-            population = generate_new_population_basic_genetic(population, costs, maximumGenes)
+            population = generate_new_population_roulette_wheel(population, costs, maximumGenes)
 
         costs = [calculate_total_cost(problem, classes, gene) for gene in population]
 
