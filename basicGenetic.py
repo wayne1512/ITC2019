@@ -37,8 +37,6 @@ def crossover_uniform(gene1, gene2):
 def mutate_uniform(gene, max_gene):
     choice = np.random.rand(*gene.shape) < mutation_chance
 
-    stats = np.count_nonzero(choice)
-
     return np.where(choice, gene, random_gene(max_gene))
 
 

@@ -9,3 +9,5 @@ class Clazz:
         self.parent_id = parent_id
         self.room_options = room_options
         self.time_options = time_options
+
+        self.room_options_ids = [opt.id for opt in room_options]
