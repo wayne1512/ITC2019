@@ -28,7 +28,35 @@ class SolutionSearch:
 
         for i, c in enumerate(self.choices_per_class):
             self.decisionTable[i, :c] = 0
+            checking_class = self.classes[i]
 
+            # close unavailable rooms
+            unflattened_class_choices = self.decisionTable[i][
+                                        :c].reshape(
+                (-1, len(self.classes[i].time_options)))
+
+            for room_option_idx, room_id in enumerate(checking_class.room_options_ids):
+                room = list(filter(lambda r: r.id == room_id, self.problem.rooms))[0]
+
+                # list of time options, True if room is unavailable at this time
+                time_mask = np.full(unflattened_class_choices.shape[1], False)
+
+                for time_option_idx, time_option in enumerate(checking_class.time_options):
+                    time_option_timeslots = time_option.get_timeslots_mask(self.problem.nrWeeks,
+                                                                           self.problem.nrDays,
+                                                                           self.problem.slotsPerDay)
+
+                    for unavailability in room.unavailabilities:
+                        unavailability_timeslots = unavailability.get_timeslots_mask(self.problem.nrWeeks,
+                                                                                     self.problem.nrDays,
+                                                                                     self.problem.slotsPerDay)
+
+                        overlaps = time_option_timeslots & unavailability_timeslots
+                        if np.count_nonzero(overlaps) > 0:
+                            time_mask[time_option_idx] = 1
+                            break  # don't bother checking other unavailabilities
+
+                unflattened_class_choices[:,time_mask] = -1
 
     def close_downwards_options(self, current_row, current_option):
         current_class = self.classes[current_row]
