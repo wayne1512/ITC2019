@@ -8,7 +8,7 @@ no_of_generations = 5000
 population_size = 640
 
 if __name__ == "__main__":
-    file_path = "D:\Downloads\\assignmentRedownload\instances\late\\tg-spr18.xml"
+    file_path = "input.xml"
     problem = parse_xml(file_path)
 
     classes = extract_class_list(problem)

@@ -29,6 +29,7 @@ class SolutionSearch:
         for i, c in enumerate(self.choices_per_class):
             self.decisionTable[i, :c] = 0
 
+
     def close_downwards_options(self, current_row, current_option):
         current_class = self.classes[current_row]
 
@@ -49,7 +50,7 @@ class SolutionSearch:
             selected_room = current_class.room_options[room_option_idx]
             selected_time = current_class.time_options[time_option_idx]
 
-            selected_time_mask = selected_time.get_timetable_mask(self.problem.nrWeeks, self.problem.nrDays,
+            selected_time_mask = selected_time.get_timeslots_mask(self.problem.nrWeeks, self.problem.nrDays,
                                                                   self.problem.slotsPerDay)
 
             for checking_class_index in range(current_row + 1, len(self.classes)):
@@ -67,7 +68,7 @@ class SolutionSearch:
                     time_mask = np.full(checking_class_option_unflattened.shape, False)
                     for time_option_idx, time_option in enumerate(checking_class.time_options):
                         overlapping_time = np.count_nonzero(
-                            selected_time_mask & time_option.get_timetable_mask(self.problem.nrWeeks,
+                            selected_time_mask & time_option.get_timeslots_mask(self.problem.nrWeeks,
                                                                                 self.problem.nrDays,
                                                                                 self.problem.slotsPerDay)) > 0
 
