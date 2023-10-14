@@ -6,7 +6,7 @@ from models.input.problem import Problem
 
 class SolutionSearch:
     def __init__(self, problem: Problem, classes: list[Clazz]):
-        self.choices_per_class = None
+        self.options_per_class = None
         self.classesWithoutRooms = None
         self.decisionTable = None
 
@@ -16,17 +16,11 @@ class SolutionSearch:
         self.setup_decision_table()
 
     def setup_decision_table(self):
-        self.choices_per_class = [1] * len(self.classes)
-        self.classesWithoutRooms = np.empty(len(self.classes))
+        self.get_options_per_class()
 
-        for i, c in enumerate(self.classes):
-            self.classesWithoutRooms[i] = len(c.room_options) == 0
+        self.decisionTable = np.full((len(self.classes), max(self.options_per_class)), -1)
 
-            self.choices_per_class[i] = max(len(c.room_options), 1) * len(c.time_options)
-
-        self.decisionTable = np.full((len(self.classes), max(self.choices_per_class)), -1)
-
-        for i, c in enumerate(self.choices_per_class):
+        for i, c in enumerate(self.options_per_class):
             self.decisionTable[i, :c] = 0
             checking_class = self.classes[i]
 
@@ -39,31 +33,40 @@ class SolutionSearch:
                 room = list(filter(lambda r: r.id == room_id, self.problem.rooms))[0]
 
                 # list of time options, True if room is unavailable at this time
-                time_mask = np.full(unflattened_class_choices.shape[1], False)
+                time_mask = [self.is_room_unavailable_during_timeslot(room, time_option) for time_option in
+                             checking_class.time_options]
 
-                for time_option_idx, time_option in enumerate(checking_class.time_options):
-                    time_option_timeslots = time_option.get_timeslots_mask(self.problem.nrWeeks,
-                                                                           self.problem.nrDays,
-                                                                           self.problem.slotsPerDay)
+                unflattened_class_choices[room_option_idx, :][time_mask] = -1
 
-                    for unavailability in room.unavailabilities:
-                        unavailability_timeslots = unavailability.get_timeslots_mask(self.problem.nrWeeks,
-                                                                                     self.problem.nrDays,
-                                                                                     self.problem.slotsPerDay)
+    def is_room_unavailable_during_timeslot(self, room, time_option):
+        time_option_timeslots = time_option.get_timeslots_mask(self.problem.nrWeeks,
+                                                               self.problem.nrDays,
+                                                               self.problem.slotsPerDay)
+        for unavailability in room.unavailabilities:
+            unavailability_timeslots = unavailability.get_timeslots_mask(self.problem.nrWeeks,
+                                                                         self.problem.nrDays,
+                                                                         self.problem.slotsPerDay)
 
-                        overlaps = time_option_timeslots & unavailability_timeslots
-                        if np.count_nonzero(overlaps) > 0:
-                            time_mask[time_option_idx] = 1
-                            break  # don't bother checking other unavailabilities
+            overlaps = time_option_timeslots & unavailability_timeslots
+            if np.count_nonzero(overlaps) > 0:
+                return True
 
-                unflattened_class_choices[:,time_mask] = -1
+        return False
+
+    def get_options_per_class(self):
+        self.options_per_class = [1] * len(self.classes)
+        self.classesWithoutRooms = np.empty(len(self.classes))
+        for i, c in enumerate(self.classes):
+            self.classesWithoutRooms[i] = len(c.room_options) == 0
+
+            self.options_per_class[i] = max(len(c.room_options), 1) * len(c.time_options)
 
     def close_downwards_options(self, current_row, current_option):
         current_class = self.classes[current_row]
 
         current_class_row = self.decisionTable[current_row]
 
-        current_class_options_unflattened = current_class_row[:self.choices_per_class[current_row]].reshape(
+        current_class_options_unflattened = current_class_row[:self.options_per_class[current_row]].reshape(
             (-1, len(current_class.time_options)))
 
         if self.classesWithoutRooms[current_row] == 0:
@@ -85,7 +88,7 @@ class SolutionSearch:
                 checking_class = self.classes[checking_class_index]
                 checking_class_row = self.decisionTable[checking_class_index]
                 checking_class_option_unflattened = checking_class_row[
-                                                    :self.choices_per_class[checking_class_index]].reshape(
+                                                    :self.options_per_class[checking_class_index]].reshape(
                     (-1, len(checking_class.time_options)))
 
                 room_mask = np.full(checking_class_option_unflattened.shape, False)

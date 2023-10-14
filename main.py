@@ -12,7 +12,7 @@ if __name__ == "__main__":
     problem = parse_xml(file_path)
 
     classes = extract_class_list(problem)
-    classes.sort(key=lambda c: len(c.time_options) * max(len(c.room_options), 1))
+    # classes.sort(key=lambda c: len(c.time_options) * max(len(c.room_options), 1))
 
     maximumGenes = get_gene_maximums(classes)
 
