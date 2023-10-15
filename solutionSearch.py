@@ -121,29 +121,42 @@ class SolutionSearch:
         current_row = 0
 
         decision_table_stack = []
+        class_list_stack = []
 
         current_option = 0
 
         while current_row < len(self.classes):
-            open_options = np.where(self.decisionTable[current_row] == 0)[0]
             # check if there is any row where all the options are closed - in which case we are ready to backtrack
-            if len(open_options) == 0 or np.any(np.all(self.decisionTable[current_row + 1:], axis=1)):
+            while np.any(np.all(self.decisionTable[current_row:], axis=1)):
                 # backtrack
                 self.decisionTable = decision_table_stack.pop()
+                self.classes = class_list_stack.pop()
                 print("backtrack from " + str(current_row) + " to " + str(current_row - 1))
                 current_row -= 1
                 option_to_close = np.where(self.decisionTable[current_row] == 1)
 
                 self.decisionTable[current_row][option_to_close] = -1  # close previous row
-            else:
 
-                current_option = open_options[0]
+            #  class with least open options
+            next_class_offset = np.argmax(np.count_nonzero(self.decisionTable[current_row:], axis=1))
+            self.classes[current_row], self.classes[next_class_offset + current_row] = self.classes[
+                next_class_offset + current_row], self.classes[current_row]
+            self.classesWithoutRooms[current_row], self.classesWithoutRooms[next_class_offset + current_row] = \
+            self.classesWithoutRooms[next_class_offset + current_row], self.classesWithoutRooms[current_row]
+            self.options_per_class[current_row], self.options_per_class[next_class_offset + current_row] = \
+            self.options_per_class[next_class_offset + current_row], self.options_per_class[current_row]
+            self.decisionTable[[current_row, next_class_offset + current_row]] = self.decisionTable[
+                [next_class_offset + current_row, current_row]]
 
-                self.decisionTable[current_row, current_option] = 1
-                decision_table_stack.append(np.copy(self.decisionTable))
+            open_options = np.where(self.decisionTable[current_row] == 0)[0]
+            current_option = open_options[0]
 
-                self.close_downwards_options(current_row, current_option)
+            self.decisionTable[current_row, current_option] = 1
+            decision_table_stack.append(np.copy(self.decisionTable))
+            class_list_stack.append(self.classes.copy())
 
-                print("proceeded from " + str(current_row) + " to " + str(current_row + 1))
+            self.close_downwards_options(current_row, current_option)
 
-                current_row += 1
+            print("proceeded from " + str(current_row) + " to " + str(current_row + 1))
+
+            current_row += 1

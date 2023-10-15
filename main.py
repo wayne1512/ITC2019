@@ -1,6 +1,6 @@
 from parseInput import parse_xml
 from solutionSearch import SolutionSearch
-from util import extract_class_list, get_gene_maximums
+from util import get_gene_maximums, extract_class_list
 
 # genetic settings
 no_of_generations = 5000
@@ -8,7 +8,9 @@ no_of_generations = 5000
 population_size = 640
 
 if __name__ == "__main__":
-    file_path = "input.xml"
+    # file_path = "input.xml"
+    file_path = "D:\\Downloads\\assignmentRedownload\\instances\\early\\agh-ggis-spr17.xml"
+
     problem = parse_xml(file_path)
 
     classes = extract_class_list(problem)
