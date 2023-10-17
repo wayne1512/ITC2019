@@ -1,6 +1,6 @@
-from parseInput import parse_xml
-from penaltyCalc import calculate_total_cost
-from solutionSearch import SolutionSearch
+from parse_input import parse_xml
+from penalty_calc import calculate_total_cost
+from solution_search import SolutionSearch
 from util import get_gene_maximums, extract_class_list
 
 # genetic settings
@@ -27,6 +27,7 @@ if __name__ == "__main__":
     gene = search.get_result_as_gene()
     classes = search.classes
     print(calculate_total_cost(problem, classes, gene))
+
     x = 1
 
     # for generation in range(no_of_generations):

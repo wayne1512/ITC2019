@@ -1,8 +1,8 @@
 from numpy.typing import NDArray
 
 from costCalcuation.clashes import calculate_clashes
-from costCalcuation.roomOptionPenalty import calculate_room_option_penalties
-from costCalcuation.timeOptionPenalty import calculate_time_option_penalties
+from costCalcuation.room_option_penalty import calculate_room_option_penalties
+from costCalcuation.time_option_penalty import calculate_time_option_penalties
 from models.input.clazz import Clazz
 from models.input.problem import Problem
 from util import sum_of_costs
