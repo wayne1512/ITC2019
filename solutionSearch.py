@@ -142,9 +142,9 @@ class SolutionSearch:
             self.classes[current_row], self.classes[next_class_offset + current_row] = self.classes[
                 next_class_offset + current_row], self.classes[current_row]
             self.classesWithoutRooms[current_row], self.classesWithoutRooms[next_class_offset + current_row] = \
-            self.classesWithoutRooms[next_class_offset + current_row], self.classesWithoutRooms[current_row]
+                self.classesWithoutRooms[next_class_offset + current_row], self.classesWithoutRooms[current_row]
             self.options_per_class[current_row], self.options_per_class[next_class_offset + current_row] = \
-            self.options_per_class[next_class_offset + current_row], self.options_per_class[current_row]
+                self.options_per_class[next_class_offset + current_row], self.options_per_class[current_row]
             self.decisionTable[[current_row, next_class_offset + current_row]] = self.decisionTable[
                 [next_class_offset + current_row, current_row]]
 
@@ -160,3 +160,19 @@ class SolutionSearch:
             print("proceeded from " + str(current_row) + " to " + str(current_row + 1))
 
             current_row += 1
+
+    def get_result_as_gene(self):
+
+        def decision_table_row_to_gene_decoder(i, row):
+            idx = np.where(row == 1)[0]
+            options_unflattened = row[:self.options_per_class[i]].reshape(
+                (-1, len(self.classes[i].time_options)))
+            room_idx, time_idx = np.unravel_index(idx, options_unflattened.shape);
+            return room_idx[0], time_idx[0]
+
+        arr = [
+            decision_table_row_to_gene_decoder(i, self.decisionTable[i])
+            for i in range(len(self.classes))
+        ]
+
+        return np.array(arr)

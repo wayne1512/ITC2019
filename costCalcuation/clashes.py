@@ -29,6 +29,7 @@ def calculate_clashes(problem, classes, rooms_option_chosen_ids, time_option_cho
 
         update_mask = np.logical_and(mask, rooms_bookings[rooms_option_chosen_ids[i]] >= 0)
 
+        # BUG HERE
         rooms_bookings[rooms_option_chosen_ids[i]][update_mask] += 1
 
     return room_clash_count, 0

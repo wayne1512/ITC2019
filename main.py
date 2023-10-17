@@ -1,4 +1,5 @@
 from parseInput import parse_xml
+from penaltyCalc import calculate_total_cost
 from solutionSearch import SolutionSearch
 from util import get_gene_maximums, extract_class_list
 
@@ -8,8 +9,8 @@ no_of_generations = 5000
 population_size = 640
 
 if __name__ == "__main__":
-    # file_path = "input.xml"
-    file_path = "D:\\Downloads\\assignmentRedownload\\instances\\early\\agh-ggis-spr17.xml"
+    file_path = "input.xml"
+    # file_path = "D:\\Downloads\\assignmentRedownload\\instances\\early\\agh-ggis-spr17.xml"
 
     problem = parse_xml(file_path)
 
@@ -23,6 +24,10 @@ if __name__ == "__main__":
 
     search = SolutionSearch(problem, classes)
     search.solve()
+    gene = search.get_result_as_gene()
+    classes = search.classes
+    print(calculate_total_cost(problem, classes, gene))
+    x = 1
 
     # for generation in range(no_of_generations):
     #     if population is None:
