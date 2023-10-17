@@ -25,11 +25,13 @@ def calculate_clashes(problem, classes, rooms_option_chosen_ids, time_option_cho
         mask = np.outer(np.outer(weeks, days), timeslots).reshape(
             (problem.nrWeeks, problem.nrDays, problem.slotsPerDay))
 
-        room_clash_count += np.count_nonzero(rooms_bookings[rooms_option_chosen_ids[i]][mask])
+        room_option_chosen = c.room_options_ids[rooms_option_chosen_ids[i]]
+        room_index = problem.rooms.index(problem.get_room_by_id(room_option_chosen))
 
-        update_mask = np.logical_and(mask, rooms_bookings[rooms_option_chosen_ids[i]] >= 0)
+        room_clash_count += np.count_nonzero(rooms_bookings[room_index][mask])
 
-        # BUG HERE
-        rooms_bookings[rooms_option_chosen_ids[i]][update_mask] += 1
+        update_mask = np.logical_and(mask, rooms_bookings[room_index] >= 0)
+
+        rooms_bookings[room_index][update_mask] += 1
 
     return room_clash_count, 0

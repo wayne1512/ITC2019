@@ -19,3 +19,8 @@ class Problem:
         self.courses: Final = courses
         self.distributions: Final = distributions
         self.students: Final = students
+
+        self.__room_dict = {r.id: r for r in rooms}
+
+    def get_room_by_id(self, id):
+        return self.__room_dict[id]
