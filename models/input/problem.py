@@ -5,6 +5,7 @@ from models.input.distribution import Distribution
 from models.input.optimization import Optimization
 from models.input.room import Room
 from models.input.student import Student
+from util import extract_class_list
 
 
 class Problem:
@@ -21,6 +22,7 @@ class Problem:
         self.students: Final = students
 
         self.__room_dict = {r.id: r for r in rooms}
+        self.classes: Final = extract_class_list(self)
 
     def get_room_by_id(self, id):
         return self.__room_dict[id]

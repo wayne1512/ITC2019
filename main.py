@@ -4,7 +4,7 @@ from matplotlib import pyplot as plt
 from basic_genetic import generate_new_population_roulette_wheel
 from parse_input import parse_xml
 from penalty_calc import calculate_total_cost
-from util import get_gene_maximums, extract_class_list, random_gene
+from util import get_gene_maximums, random_gene
 
 # genetic settings
 no_of_generations = 5000
@@ -12,12 +12,11 @@ no_of_generations = 5000
 population_size = 64
 
 if __name__ == "__main__":
-    # file_path = "input.xml"
-    file_path = "D:\\Downloads\\assignmentRedownload\\instances\\early\\agh-ggis-spr17.xml"
+    file_path = "input.xml"
+    # file_path = "D:\\Downloads\\assignmentRedownload\\instances\\early\\agh-ggis-spr17.xml"
 
     problem = parse_xml(file_path)
 
-    classes = extract_class_list(problem)
     # classes.sort(key=lambda c: len(c.time_options) * max(len(c.room_options), 1))
 
 
@@ -31,7 +30,7 @@ if __name__ == "__main__":
     # print(calculate_total_cost(problem, classes, gene))
 
     x = 1
-    maximumGenes = get_gene_maximums(classes)
+    maximumGenes = get_gene_maximums(problem.classes)
 
     for generation in range(no_of_generations):
         if population is None:
@@ -39,7 +38,7 @@ if __name__ == "__main__":
         else:
             population = generate_new_population_roulette_wheel(population, costs, maximumGenes)
 
-        costs = [calculate_total_cost(problem, classes, gene) for gene in population]
+        costs = [calculate_total_cost(problem, gene) for gene in population]
 
         x = np.arange(population_size)
         fig, ax1 = plt.subplots()

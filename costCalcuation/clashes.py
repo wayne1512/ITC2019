@@ -1,7 +1,7 @@
 import numpy as np
 
 
-def calculate_clashes(problem, classes, rooms_option_chosen_ids, time_option_chosen_ids):
+def calculate_clashes(problem, rooms_option_chosen_ids, time_option_chosen_ids):
     rooms_bookings = np.zeros((len(problem.rooms), problem.nrWeeks, problem.nrDays, problem.slotsPerDay))
 
     for idx, room in enumerate(problem.rooms):
@@ -10,7 +10,7 @@ def calculate_clashes(problem, classes, rooms_option_chosen_ids, time_option_cho
 
     room_clash_count = 0
 
-    for i, c in enumerate(classes):
+    for i, c in enumerate(problem.classes):
 
         if rooms_option_chosen_ids[i] < 0:
             continue
