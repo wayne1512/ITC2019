@@ -1,6 +1,5 @@
 import numpy as np
 
-from models.input.clazz import Clazz
 from models.input.problem import Problem
 
 
@@ -10,7 +9,7 @@ class SolutionSearch:
         self.classesWithoutRooms = None
         self.decisionTable = None
 
-        self.classes = problem.classes
+        self.classes = problem.classes.copy()
         self.problem = problem
 
         self.setup_decision_table()
@@ -173,8 +172,8 @@ class SolutionSearch:
             return room_idx[0], time_idx[0]
 
         arr = [
-            decision_table_row_to_gene_decoder(i, self.decisionTable[i])
-            for i in range(len(self.classes))
+            decision_table_row_to_gene_decoder(table_idx := self.classes.index(c), self.decisionTable[table_idx])
+            for c in self.problem.classes
         ]
 
         return np.array(arr)

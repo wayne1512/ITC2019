@@ -1,11 +1,6 @@
-import numpy as np
-from matplotlib import pyplot as plt
-
-from basic_genetic import generate_new_population_roulette_wheel
 from parse_input import parse_xml
 from penalty_calc import calculate_total_cost
 from solution_search import SolutionSearch
-from util import get_gene_maximums, random_gene
 
 # genetic settings
 no_of_generations = 5000
@@ -27,7 +22,6 @@ if __name__ == "__main__":
     search = SolutionSearch(problem)
     search.solve()
     gene = search.get_result_as_gene()
-    classes = search.classes
     print(calculate_total_cost(problem, gene))
 
     x = 1
