@@ -4,6 +4,7 @@ from matplotlib import pyplot as plt
 from basic_genetic import generate_new_population_roulette_wheel
 from parse_input import parse_xml
 from penalty_calc import calculate_total_cost
+from solution_search import SolutionSearch
 from util import get_gene_maximums, random_gene
 
 # genetic settings
@@ -23,36 +24,36 @@ if __name__ == "__main__":
     population = None
     costs = None
 
-    # search = SolutionSearch(problem, classes)
-    # search.solve()
-    # gene = search.get_result_as_gene()
-    # classes = search.classes
-    # print(calculate_total_cost(problem, classes, gene))
+    search = SolutionSearch(problem)
+    search.solve()
+    gene = search.get_result_as_gene()
+    classes = search.classes
+    print(calculate_total_cost(problem, gene))
 
     x = 1
-    maximumGenes = get_gene_maximums(problem.classes)
-
-    for generation in range(no_of_generations):
-        if population is None:
-            population = [random_gene(maximumGenes) for _ in range(population_size)]
-        else:
-            population = generate_new_population_roulette_wheel(population, costs, maximumGenes)
-
-        costs = [calculate_total_cost(problem, gene) for gene in population]
-
-        x = np.arange(population_size)
-        fig, ax1 = plt.subplots()
-
-        ax1.plot(x, [cost[0] for cost in costs], linewidth=2, label='hard', color='r')
-
-        ax2 = ax1.twinx()
-
-        ax2.plot(x, [cost[1] for cost in costs], linewidth=2, label='soft', color='b')
-
-        # Adding legends
-        ax1.legend(loc='upper left')
-        ax2.legend(loc='upper right')
-
-        plt.title("generation " + str(generation))
-
-        plt.show()
+    # maximumGenes = get_gene_maximums(problem.classes)
+    #
+    # for generation in range(no_of_generations):
+    #     if population is None:
+    #         population = [random_gene(maximumGenes) for _ in range(population_size)]
+    #     else:
+    #         population = generate_new_population_roulette_wheel(population, costs, maximumGenes)
+    #
+    #     costs = [calculate_total_cost(problem, gene) for gene in population]
+    #
+    #     x = np.arange(population_size)
+    #     fig, ax1 = plt.subplots()
+    #
+    #     ax1.plot(x, [cost[0] for cost in costs], linewidth=2, label='hard', color='r')
+    #
+    #     ax2 = ax1.twinx()
+    #
+    #     ax2.plot(x, [cost[1] for cost in costs], linewidth=2, label='soft', color='b')
+    #
+    #     # Adding legends
+    #     ax1.legend(loc='upper left')
+    #     ax2.legend(loc='upper right')
+    #
+    #     plt.title("generation " + str(generation))
+    #
+    #     plt.show()

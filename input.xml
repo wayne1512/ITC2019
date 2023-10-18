@@ -2964,6 +2964,31 @@
         </subpart>
       </config>
     </course>
+    <course id="5">
+      <config id="5">
+        <subpart id="5">
+          <class id="5" limit="10">
+            <time days="1111000" start="96" length="22" weeks="111111111" penalty="0"/>
+            <time days="1111000" start="108" length="22" weeks="111111111" penalty="0"/>
+            <time days="1111000" start="114" length="22" weeks="111111111" penalty="0"/>
+            <time days="1111000" start="120" length="22" weeks="111111111" penalty="0"/>
+            <time days="1111000" start="126" length="22" weeks="111111111" penalty="0"/>
+            <time days="1111000" start="132" length="22" weeks="111111111" penalty="0"/>
+            <time days="1111000" start="138" length="22" weeks="111111111" penalty="0"/>
+            <time days="1111000" start="144" length="22" weeks="111111111" penalty="0"/>
+            <time days="1111000" start="150" length="22" weeks="111111111" penalty="0"/>
+            <time days="1111000" start="156" length="22" weeks="111111111" penalty="0"/>
+            <time days="1111000" start="162" length="22" weeks="111111111" penalty="0"/>
+            <time days="1111000" start="168" length="22" weeks="111111111" penalty="0"/>
+            <time days="1111000" start="174" length="22" weeks="111111111" penalty="0"/>
+            <time days="1111000" start="180" length="22" weeks="111111111" penalty="0"/>
+            <time days="1111000" start="186" length="22" weeks="111111111" penalty="0"/>
+            <time days="1111000" start="192" length="22" weeks="111111111" penalty="0"/>
+            <time days="1111000" start="198" length="22" weeks="111111111" penalty="12"/>
+          </class>
+        </subpart>
+      </config>
+    </course>
   </courses>
   <distributions>
     <distribution type="SameAttendees" required="true">

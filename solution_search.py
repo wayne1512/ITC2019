@@ -5,12 +5,12 @@ from models.input.problem import Problem
 
 
 class SolutionSearch:
-    def __init__(self, problem: Problem, classes: list[Clazz]):
+    def __init__(self, problem: Problem):
         self.options_per_class = None
         self.classesWithoutRooms = None
         self.decisionTable = None
 
-        self.classes = classes
+        self.classes = problem.classes
         self.problem = problem
 
         self.setup_decision_table()
@@ -168,6 +168,8 @@ class SolutionSearch:
             options_unflattened = row[:self.options_per_class[i]].reshape(
                 (-1, len(self.classes[i].time_options)))
             room_idx, time_idx = np.unravel_index(idx, options_unflattened.shape);
+            if self.classesWithoutRooms[i]:
+                room_idx = [-1]
             return room_idx[0], time_idx[0]
 
         arr = [
