@@ -9,7 +9,8 @@ population_size = 64
 
 if __name__ == "__main__":
     file_path = "input.xml"
-    # file_path = "D:\\Downloads\\assignmentRedownload\\instances\\early\\agh-ggis-spr17.xml"
+    file_path = "D:\\Downloads\\assignmentRedownload\\instances\\late\\muni-fspsx-fal17.xml"
+    # file_path = "D:\\Downloads\\assignmentRedownload\\instances\\late\\muni-pdfx-fal17.xml"
 
     problem = parse_xml(file_path)
 

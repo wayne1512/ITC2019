@@ -114,13 +114,10 @@ class SolutionSearch:
                     # cupy
                     # closing_mask_padded[:len(closing_mask)] = closing_mask[:len(closing_mask)]
 
-                    self.decisionTable[checking_class_index][closing_mask_padded] = -1  # close
+                    self.decisionTable[checking_class_index][closing_mask_padded] = (-current_row - 2)  # close
 
     def solve(self):
         current_row = 0
-
-        decision_table_stack = []
-        class_list_stack = []
 
         current_option = 0
 
@@ -128,13 +125,13 @@ class SolutionSearch:
             # check if there is any row where all the options are closed - in which case we are ready to backtrack
             while np.any(np.all(self.decisionTable[current_row:], axis=1)):
                 # backtrack
-                self.decisionTable = decision_table_stack.pop()
-                self.classes = class_list_stack.pop()
+                self.decisionTable[self.decisionTable <= (-current_row - 2)] = 0
+
                 print("backtrack from " + str(current_row) + " to " + str(current_row - 1))
                 current_row -= 1
                 option_to_close = np.where(self.decisionTable[current_row] == 1)
 
-                self.decisionTable[current_row][option_to_close] = -1  # close previous row
+                self.decisionTable[current_row][option_to_close] = (-current_row - 2)  # close previous row
 
             #  class with least open options
             next_class_offset = np.argmax(np.count_nonzero(self.decisionTable[current_row:], axis=1))
@@ -151,8 +148,6 @@ class SolutionSearch:
             current_option = open_options[0]
 
             self.decisionTable[current_row, current_option] = 1
-            decision_table_stack.append(np.copy(self.decisionTable))
-            class_list_stack.append(self.classes.copy())
 
             self.close_downwards_options(current_row, current_option)
 
