@@ -1,5 +1,6 @@
 import numpy as np
 
+from costCalcuation.clashes import clashes_close_downwards_option
 from models.input.problem import Problem
 
 
@@ -61,60 +62,11 @@ class SolutionSearch:
             self.options_per_class[i] = max(len(c.room_options), 1) * len(c.time_options)
 
     def close_downwards_options(self, current_row, current_option):
-        current_class = self.classes[current_row]
+        mask = clashes_close_downwards_option(self, current_row, current_option)  # close other options in the same room
 
-        current_class_row = self.decisionTable[current_row]
+        mask = mask & (self.decisionTable == 0)
+        self.decisionTable[mask] = (-current_row - 2)  # close
 
-        current_class_options_unflattened = current_class_row[:self.options_per_class[current_row]].reshape(
-            (-1, len(current_class.time_options)))
-
-        if self.classesWithoutRooms[current_row] == 0:
-            # class has a room, therefore we must check that no other lesson is scheduled in the same room at the same time
-            room_option_idx, time_option_idx = np.unravel_index(np.array(current_option),
-                                                                current_class_options_unflattened.shape)  # cast to array needed for cupy
-
-            # # cast needed for cupy - numpy is unaffected
-            # room_option_idx = int(room_option_idx)
-            # time_option_idx = int(time_option_idx)
-
-            selected_room = current_class.room_options[room_option_idx]
-            selected_time = current_class.time_options[time_option_idx]
-
-            selected_time_mask = selected_time.get_timeslots_mask(self.problem.nrWeeks, self.problem.nrDays,
-                                                                  self.problem.slotsPerDay)
-
-            for checking_class_index in range(current_row + 1, len(self.classes)):
-                checking_class = self.classes[checking_class_index]
-                checking_class_row = self.decisionTable[checking_class_index]
-                checking_class_option_unflattened = checking_class_row[
-                                                    :self.options_per_class[checking_class_index]].reshape(
-                    (-1, len(checking_class.time_options)))
-
-                room_mask = np.full(checking_class_option_unflattened.shape, False)
-                if selected_room.id in checking_class.room_options_ids:
-                    idx = checking_class.room_options_ids.index(selected_room.id)
-                    room_mask[idx, :] = True
-
-                    time_mask = np.full(checking_class_option_unflattened.shape, False)
-                    for time_option_idx, time_option in enumerate(checking_class.time_options):
-                        overlapping_time = np.count_nonzero(
-                            selected_time_mask & time_option.get_timeslots_mask(self.problem.nrWeeks,
-                                                                                self.problem.nrDays,
-                                                                                self.problem.slotsPerDay)) > 0
-
-                        if overlapping_time:
-                            time_mask[:, time_option_idx] = True
-
-                    closing_mask = (time_mask & room_mask).flat
-                    closing_mask_padded = np.full(self.decisionTable.shape[1], False)
-
-                    # numpy
-                    closing_mask_padded[:len(closing_mask)] = closing_mask
-
-                    # cupy
-                    # closing_mask_padded[:len(closing_mask)] = closing_mask[:len(closing_mask)]
-
-                    self.decisionTable[checking_class_index][closing_mask_padded] = (-current_row - 2)  # close
 
     def solve(self):
         current_row = 0
@@ -125,13 +77,13 @@ class SolutionSearch:
             # check if there is any row where all the options are closed - in which case we are ready to backtrack
             while np.any(np.all(self.decisionTable[current_row:], axis=1)):
                 # backtrack
-                self.decisionTable[self.decisionTable <= (-current_row - 2)] = 0
+                self.decisionTable[self.decisionTable <= (-current_row - 1)] = 0
 
                 print("backtrack from " + str(current_row) + " to " + str(current_row - 1))
                 current_row -= 1
                 option_to_close = np.where(self.decisionTable[current_row] == 1)
 
-                self.decisionTable[current_row][option_to_close] = (-current_row - 2)  # close previous row
+                self.decisionTable[current_row][option_to_close] = (-current_row - 1)  # close previous row
 
             #  class with least open options
             next_class_offset = np.argmax(np.count_nonzero(self.decisionTable[current_row:], axis=1))
