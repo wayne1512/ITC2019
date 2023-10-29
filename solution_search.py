@@ -64,9 +64,12 @@ class SolutionSearch:
     def close_downwards_options(self, current_row, current_option):
         mask = clashes_close_downwards_option(self, current_row, current_option)  # close other options in the same room
 
+        for d in self.problem.distributions:
+            if d.required and self.classes[current_row].id in d.class_ids:
+                mask = mask | d.distribution_helper.close_downwards_option(self, current_row, current_option)
+
         mask = mask & (self.decisionTable == 0)
         self.decisionTable[mask] = (-current_row - 2)  # close
-
 
     def solve(self):
         current_row = 0
@@ -113,7 +116,7 @@ class SolutionSearch:
             idx = np.where(row == 1)[0]
             options_unflattened = row[:self.options_per_class[i]].reshape(
                 (-1, len(self.classes[i].time_options)))
-            room_idx, time_idx = np.unravel_index(idx, options_unflattened.shape);
+            room_idx, time_idx = np.unravel_index(idx, options_unflattened.shape)
             if self.classesWithoutRooms[i]:
                 room_idx = [-1]
             return room_idx[0], time_idx[0]

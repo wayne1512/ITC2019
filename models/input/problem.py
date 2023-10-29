@@ -23,6 +23,10 @@ class Problem:
 
         self.__room_dict = {r.id: r for r in rooms}
         self.classes: Final = extract_class_list(self)
+        self.__class_dict = {c.id: c for c in self.classes}
 
     def get_room_by_id(self, id):
         return self.__room_dict[id]
+
+    def get_class_by_id(self, id):
+        return self.__class_dict[id]

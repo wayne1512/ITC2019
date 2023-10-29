@@ -1,3 +1,4 @@
+from costCalcuation.distributions.create_distribtion_helper import create_helper_for_distribution
 from parse_input import parse_xml
 from penalty_calc import calculate_total_cost
 from solution_search import SolutionSearch
@@ -8,15 +9,17 @@ no_of_generations = 5000
 population_size = 64
 
 if __name__ == "__main__":
-    # file_path = "input.xml"
-    file_path = "D:\\Downloads\\assignmentRedownload\\instances\\early\\bet-fal17.xml"
-    file_path = "D:\\Downloads\\assignmentRedownload\\instances\\early\\agh-fis-spr17.xml"
+    file_path = "input.xml"
+    # file_path = "D:\\Downloads\\assignmentRedownload\\instances\\early\\bet-fal17.xml"
+    # file_path = "D:\\Downloads\\assignmentRedownload\\instances\\early\\iku-fal17.xml"
     # file_path = "D:\\Downloads\\assignmentRedownload\\instances\\late\\muni-pdfx-fal17.xml"
 
     problem = parse_xml(file_path)
 
-    # classes.sort(key=lambda c: len(c.time_options) * max(len(c.room_options), 1))
+    for d in problem.distributions:
+        d.distribution_helper = create_helper_for_distribution(problem, d)
 
+    # classes.sort(key=lambda c: len(c.time_options) * max(len(c.room_options), 1))
 
     population = None
     costs = None
