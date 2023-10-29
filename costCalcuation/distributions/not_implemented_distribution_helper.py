@@ -1,5 +1,3 @@
-import numpy as np
-
 from models.input.distribution import Distribution
 
 
@@ -14,5 +12,5 @@ class NotImplementedDistributionHelper:
     def calculate_clashes(self, rooms_option_chosen_ids, time_option_chosen_ids):
         return 0, 0
 
-    def close_downwards_option(self, solution_search, current_row, current_option):
-        return np.full(solution_search.decisionTable.shape, False)
+    def close_downwards_option(self, solution_search, current_row, current_option, closing_mask):
+        pass

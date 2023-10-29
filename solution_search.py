@@ -66,7 +66,7 @@ class SolutionSearch:
 
         for d in self.problem.distributions:
             if d.required and self.classes[current_row].id in d.class_ids:
-                mask = mask | d.distribution_helper.close_downwards_option(self, current_row, current_option)
+                d.distribution_helper.close_downwards_option(self, current_row, current_option, mask)
 
         mask = mask & (self.decisionTable == 0)
         self.decisionTable[mask] = (-current_row - 2)  # close

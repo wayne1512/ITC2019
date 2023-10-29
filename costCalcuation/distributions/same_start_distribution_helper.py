@@ -28,9 +28,7 @@ class SameStartDistributionHelper:
             return violation_count, 0
         return 0, violation_count * self.distribution.penalty
 
-    def close_downwards_option(self, solution_search, current_row, current_option):
-
-        combined_closing_mask = np.full_like(solution_search.decisionTable, False, dtype=bool)
+    def close_downwards_option(self, solution_search, current_row, current_option, combined_closing_mask):
 
         current_class = solution_search.classes[current_row]
 
@@ -68,5 +66,5 @@ class SameStartDistributionHelper:
                 mask_padded = np.full(combined_closing_mask.shape[1], False)
                 mask_padded[:len(mask_flat)] = mask_flat
 
-                combined_closing_mask[checking_class_row_index_in_search] = mask_padded
-        return combined_closing_mask
+                combined_closing_mask[checking_class_row_index_in_search] = combined_closing_mask[
+                                                                                checking_class_row_index_in_search] | mask_padded
