@@ -1,3 +1,5 @@
+import numpy as np
+
 from costCalcuation.distributions.create_distribtion_helper import create_helper_for_distribution
 from parse_input import parse_xml
 from penalty_calc import calculate_total_cost
@@ -9,8 +11,11 @@ no_of_generations = 5000
 population_size = 64
 
 if __name__ == "__main__":
-    file_path = "input.xml"
-    # file_path = "D:\\Downloads\\assignmentRedownload\\instances\\early\\bet-fal17.xml"
+
+    debug_read_checkpoint = False
+
+    file_path = "input1.xml"
+    # file_path = "D:\\Downloads\\assignmentRedownload\\instances\\early\\pu-llr-spr17.xml"
     # file_path = "D:\\Downloads\\assignmentRedownload\\instances\\early\\iku-fal17.xml"
     # file_path = "D:\\Downloads\\assignmentRedownload\\instances\\late\\muni-pdfx-fal17.xml"
 
@@ -19,14 +24,18 @@ if __name__ == "__main__":
     for d in problem.distributions:
         d.distribution_helper = create_helper_for_distribution(problem, d)
 
-    # classes.sort(key=lambda c: len(c.time_options) * max(len(c.room_options), 1))
+    if debug_read_checkpoint:
+        gene = np.load("checkpoint.npy")
+    else:
+        population = None
+        costs = None
 
-    population = None
-    costs = None
+        search = SolutionSearch(problem)
+        search.solve()
+        gene = search.get_result_as_gene()
 
-    search = SolutionSearch(problem)
-    search.solve()
-    gene = search.get_result_as_gene()
+        np.save("checkpoint", gene)
+
     print(calculate_total_cost(problem, gene))
 
     x = 1
