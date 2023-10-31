@@ -1,9 +1,11 @@
 from costCalcuation.distributions.different_days_distribution_helper import DifferentDaysDistributionHelper
 from costCalcuation.distributions.different_time_distribution_helper import DifferentTimeDistributionHelper
+from costCalcuation.distributions.different_weeks_distribution_helper import DifferentWeeksDistributionHelper
 from costCalcuation.distributions.not_implemented_distribution_helper import NotImplementedDistributionHelper
 from costCalcuation.distributions.same_days_distribution_helper import SameDaysDistributionHelper
 from costCalcuation.distributions.same_start_distribution_helper import SameStartDistributionHelper
 from costCalcuation.distributions.same_time_distribution_helper import SameTimeDistributionHelper
+from costCalcuation.distributions.same_weeks_distribution_helper import SameWeeksDistributionHelper
 from models.input.distribution import Distribution
 from models.input.problem import Problem
 
@@ -24,5 +26,11 @@ def create_helper_for_distribution(problem: Problem, distribution: Distribution)
 
     if dist_type == "DifferentDays":
         return DifferentDaysDistributionHelper(problem, distribution)
+
+    if dist_type == "SameWeeks":
+        return SameWeeksDistributionHelper(problem, distribution)
+
+    if dist_type == "DifferentWeeks":
+        return DifferentWeeksDistributionHelper(problem, distribution)
 
     return NotImplementedDistributionHelper(problem, distribution)
