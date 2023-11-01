@@ -30,3 +30,14 @@ class Problem:
 
     def get_class_by_id(self, id):
         return self.__class_dict[id]
+
+    def get_travel_time(self, room_id_1, room_id_2):
+        travel = list(filter(lambda t: (t.room_id == room_id_2), self.get_room_by_id(room_id_1).travel))
+        if len(travel) > 0:
+            return travel[0].value
+
+        travel = list(filter(lambda t: (t.room_id == room_id_1), self.get_room_by_id(room_id_2).travel))
+        if len(travel) > 0:
+            return travel[0].value
+
+        return 0

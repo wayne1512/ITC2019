@@ -14,8 +14,8 @@ if __name__ == "__main__":
 
     debug_read_checkpoint = False
 
-    file_path = "input1.xml"
-    # file_path = "D:\\Downloads\\assignmentRedownload\\instances\\early\\agh-fis-spr17.xml"
+    file_path = "input.xml"
+    file_path = "D:\\Downloads\\assignmentRedownload\\instances\\early\\agh-fis-spr17.xml"
     # file_path = "D:\\Downloads\\assignmentRedownload\\instances\\early\\iku-fal17.xml"
     # file_path = "D:\\Downloads\\assignmentRedownload\\instances\\late\\muni-pdfx-fal17.xml"
 
