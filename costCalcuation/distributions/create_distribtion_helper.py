@@ -5,6 +5,7 @@ from costCalcuation.distributions.different_weeks_distribution_helper import Dif
 from costCalcuation.distributions.not_implemented_distribution_helper import NotImplementedDistributionHelper
 from costCalcuation.distributions.not_overlap_distribution_helper import NotOverlapDistributionHelper
 from costCalcuation.distributions.overlap_distribution_helper import OverlapDistributionHelper
+from costCalcuation.distributions.precedence_distribution_helper import PrecedenceDistributionHelper
 from costCalcuation.distributions.same_attendees_distribution_helper import SameAttendeesDistributionHelper
 from costCalcuation.distributions.same_days_distribution_helper import SameDaysDistributionHelper
 from costCalcuation.distributions.same_room_distribution_helper import SameRoomDistributionHelper
@@ -52,5 +53,8 @@ def create_helper_for_distribution(problem: Problem, distribution: Distribution)
 
     if dist_type == "SameAttendees":
         return SameAttendeesDistributionHelper(problem, distribution)
+
+    if dist_type == "Precedence":
+        return PrecedenceDistributionHelper(problem, distribution)
 
     return NotImplementedDistributionHelper(problem, distribution)
