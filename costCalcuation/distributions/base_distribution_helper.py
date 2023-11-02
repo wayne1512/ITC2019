@@ -34,7 +34,7 @@ class BaseDistributionHelper(ABC, metaclass=ABCMeta):
         current_class = solution_search.classes[current_row]
 
         if current_class.id not in self.distribution.class_ids:
-            return combined_closing_mask
+            return
 
         current_room_option_idx, current_time_option_idx = \
             np.unravel_index(current_option, (max(len(current_class.room_options), 1), len(current_class.time_options)))
@@ -48,13 +48,10 @@ class BaseDistributionHelper(ABC, metaclass=ABCMeta):
             checking_class_row_index_in_search = solution_search.classes.index(checking_class)
 
             if checking_class_row_index_in_search > current_row:  # only close downwards options
-                # not_same_start_time = [time_option.start != current_time_option.start
-                #                        for time_option in checking_class.time_options]
 
                 mask_sub_part = combined_closing_mask[checking_class_row_index_in_search,
                                 :solution_search.options_per_class[checking_class_row_index_in_search]]
                 mask_sub_part_unflattened = mask_sub_part.reshape((-1, len(checking_class.time_options)))
-                # mask_sub_part_unflattened[:, not_same_start_time] = 1
                 self.close_options_for_checking_class(current_class, current_room_option, current_time_option,
                                                       checking_class, mask_sub_part_unflattened)
 
