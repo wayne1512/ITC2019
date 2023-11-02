@@ -4,6 +4,7 @@ from costCalcuation.distributions.different_days_distribution_helper import Diff
 from costCalcuation.distributions.different_room_distribution_helper import DifferentRoomDistributionHelper
 from costCalcuation.distributions.different_time_distribution_helper import DifferentTimeDistributionHelper
 from costCalcuation.distributions.different_weeks_distribution_helper import DifferentWeeksDistributionHelper
+from costCalcuation.distributions.min_gap_distribution_helper import MinGapDistributionHelper
 from costCalcuation.distributions.not_implemented_distribution_helper import NotImplementedDistributionHelper
 from costCalcuation.distributions.not_overlap_distribution_helper import NotOverlapDistributionHelper
 from costCalcuation.distributions.overlap_distribution_helper import OverlapDistributionHelper
@@ -63,5 +64,9 @@ def create_helper_for_distribution(problem: Problem, distribution: Distribution)
     match = re.search("WorkDay\\((\\d+)\\)", dist_type)
     if match is not None:
         return WorkDaysDistributionHelper(problem, distribution, int(match.group(1)))
+
+    match = re.search("MinGap\\((\\d+)\\)", dist_type)
+    if match is not None:
+        return MinGapDistributionHelper(problem, distribution, int(match.group(1)))
 
     return NotImplementedDistributionHelper(problem, distribution)
