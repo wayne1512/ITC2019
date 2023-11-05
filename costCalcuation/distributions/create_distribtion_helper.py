@@ -4,6 +4,7 @@ from costCalcuation.distributions.different_days_distribution_helper import Diff
 from costCalcuation.distributions.different_room_distribution_helper import DifferentRoomDistributionHelper
 from costCalcuation.distributions.different_time_distribution_helper import DifferentTimeDistributionHelper
 from costCalcuation.distributions.different_weeks_distribution_helper import DifferentWeeksDistributionHelper
+from costCalcuation.distributions.max_block_distribution_helper import MaxBlockDistributionHelper
 from costCalcuation.distributions.max_breaks_distribution_helper import MaxBreaksDistributionHelper
 from costCalcuation.distributions.max_day_load_distribution_helper import MaxDayLoadDistributionHelper
 from costCalcuation.distributions.max_days_distribution_helper import MaxDaysDistributionHelper
@@ -83,5 +84,9 @@ def create_helper_for_distribution(problem: Problem, distribution: Distribution)
     match = re.search("MaxBreaks\\((\\d+),(\\d+)\\)", dist_type)
     if match is not None:
         return MaxBreaksDistributionHelper(problem, distribution, int(match.group(1)), int(match.group(2)))
+
+    match = re.search("MaxBlock\\((\\d+),(\\d+)\\)", dist_type)
+    if match is not None:
+        return MaxBlockDistributionHelper(problem, distribution, int(match.group(1)), int(match.group(2)))
 
     return NotImplementedDistributionHelper(problem, distribution)

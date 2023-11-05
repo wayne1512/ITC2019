@@ -89,7 +89,7 @@ class MaxBreaksDistributionHelper:
             for checking_time_idx, checking_time_option in enumerate(checking_class.time_options):
                 slots_used_copy = slots_used.copy()
 
-                slots_used[checking_time_option.get_timeslots_mask(self.problem.nrWeeks, self.problem.nrDays,
+                slots_used_copy[checking_time_option.get_timeslots_mask(self.problem.nrWeeks, self.problem.nrDays,
                                                                    self.problem.slotsPerDay)] = True
 
                 for w in range(self.problem.nrWeeks):
@@ -101,7 +101,7 @@ class MaxBreaksDistributionHelper:
 
                                 break_count = 0
 
-                                for s in slots_used[w, d, :]:
+                                for s in slots_used_copy[w, d, :]:
                                     if s:
                                         started_day = True
 
