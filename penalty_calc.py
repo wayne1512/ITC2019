@@ -18,4 +18,7 @@ def calculate_total_cost(problem: Problem, gene: NDArray):
 
     clash_penalties = calculate_clashes(problem, rooms_chosen_idx, times_chosen_idx)
 
-    return sum_of_costs([room_penalties, time_penalties, clash_penalties])
+    distribution_penalites = sum_of_costs(
+        [d.distribution_helper.calculate_clashes(rooms_chosen_idx, times_chosen_idx) for d in problem.distributions])
+
+    return sum_of_costs([room_penalties, time_penalties, clash_penalties, distribution_penalites])

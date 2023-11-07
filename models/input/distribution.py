@@ -4,3 +4,5 @@ class Distribution:
         self.penalty = penalty
         self.required = required
         self.type = type
+
+        self.distribution_helper = None
