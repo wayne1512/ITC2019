@@ -41,7 +41,7 @@ class BaseDistributionHelper(ABC, metaclass=ABCMeta):
 
         current_time_option = current_class.time_options[current_time_option_idx]
         current_room_option = current_class.room_options[current_room_option_idx] if not \
-            solution_search.classesWithoutRooms[current_row] else None
+            solution_search.classes_without_rooms[current_row] else None
 
         for checking_class_id in self.distribution.class_ids:
             checking_class = self.problem.get_class_by_id(checking_class_id)

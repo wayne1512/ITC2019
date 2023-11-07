@@ -13,11 +13,11 @@ population_size = 64
 
 if __name__ == "__main__":
 
-    debug_read_checkpoint = True
+    debug_read_checkpoint = False
 
-    file_path = "input.xml"
+    # file_path = "input.xml"
     # file_path = "D:\\Downloads\\assignmentRedownload\\instances\\early\\agh-fis-spr17.xml"
-    # file_path = "D:\\Downloads\\assignmentRedownload\\instances\\middle\\muni-fi-spr17.xml"
+    file_path = "D:\\Downloads\\assignmentRedownload\\instances\\middle\\muni-fi-spr17.xml"
     # file_path = "D:\\Downloads\\assignmentRedownload\\instances\\late\\muni-pdfx-fal17.xml"
 
     problem = parse_xml(file_path)

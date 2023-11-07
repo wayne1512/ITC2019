@@ -48,7 +48,7 @@ class MaxDayLoadDistributionHelper:
 
         already_placed_time_options = []
         for c, checking_class_idx, in zip(already_placed_classes, index_of_already_placed_classes_in_search):
-            selected_option_of_checking_class = np.where(solution_search.decisionTable[checking_class_idx] == 1)[0][0]
+            selected_option_of_checking_class = np.where(solution_search.decision_table[checking_class_idx] == 1)[0][0]
             room_option_idx, time_option_idx = np.unravel_index(selected_option_of_checking_class, (
                 max(len(c.room_options), 1), len(c.time_options)))
 

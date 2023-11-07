@@ -38,11 +38,11 @@ def calculate_clashes(problem, rooms_option_chosen_ids, time_option_chosen_ids):
 
 
 def clashes_close_downwards_option(solution_search, current_row, current_option):
-    combined_closing_mask = np.full_like(solution_search.decisionTable, False, dtype=bool)
+    combined_closing_mask = np.full_like(solution_search.decision_table, False, dtype=bool)
 
     current_class = solution_search.classes[current_row]
 
-    current_class_row = solution_search.decisionTable[current_row]
+    current_class_row = solution_search.decision_table[current_row]
 
     current_class_options_unflattened = current_class_row[:solution_search.options_per_class[current_row]].reshape(
         (-1, len(current_class.time_options)))
@@ -62,7 +62,7 @@ def clashes_close_downwards_option(solution_search, current_row, current_option)
 
     for checking_class_index in range(current_row + 1, len(solution_search.classes)):
         checking_class = solution_search.classes[checking_class_index]
-        checking_class_row = solution_search.decisionTable[checking_class_index]
+        checking_class_row = solution_search.decision_table[checking_class_index]
         checking_class_option_unflattened = checking_class_row[
                                             :solution_search.options_per_class[checking_class_index]].reshape(
             (-1, len(checking_class.time_options)))
@@ -83,7 +83,7 @@ def clashes_close_downwards_option(solution_search, current_row, current_option)
                 time_mask[:, time_option_idx] = True
 
         closing_mask = (time_mask & room_mask).flat
-        closing_mask_padded = np.full(solution_search.decisionTable.shape[1], False)
+        closing_mask_padded = np.full(solution_search.decision_table.shape[1], False)
         closing_mask_padded[:len(closing_mask)] = closing_mask
 
         combined_closing_mask[checking_class_index][closing_mask_padded] = 1
