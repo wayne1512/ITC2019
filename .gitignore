@@ -166,3 +166,4 @@ cython_debug/
 /input1.xml
 /*.ipynb
 /checkpoint.npy
+/output.xml

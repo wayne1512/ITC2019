@@ -4,6 +4,7 @@ from costCalcuation.distributions.create_distribtion_helper import create_helper
 from parse_input import parse_xml
 from penalty_calc import calculate_total_cost
 from solution_search import SolutionSearch
+from solution_to_xml import generate_xml
 
 # genetic settings
 no_of_generations = 5000
@@ -12,11 +13,11 @@ population_size = 64
 
 if __name__ == "__main__":
 
-    debug_read_checkpoint = False
+    debug_read_checkpoint = True
 
-    # file_path = "input.xml"
+    file_path = "input.xml"
     # file_path = "D:\\Downloads\\assignmentRedownload\\instances\\early\\agh-fis-spr17.xml"
-    file_path = "D:\\Downloads\\assignmentRedownload\\instances\\middle\\muni-fi-spr17.xml"
+    # file_path = "D:\\Downloads\\assignmentRedownload\\instances\\middle\\muni-fi-spr17.xml"
     # file_path = "D:\\Downloads\\assignmentRedownload\\instances\\late\\muni-pdfx-fal17.xml"
 
     problem = parse_xml(file_path)
@@ -37,6 +38,7 @@ if __name__ == "__main__":
         np.save("checkpoint", gene)
 
     print(calculate_total_cost(problem, gene))
+    generate_xml(problem, gene)
 
     x = 1
     # maximumGenes = get_gene_maximums(problem.classes)

@@ -5,6 +5,10 @@ def bool_string_to_bool_arr(s):
     return [bool(int(c)) for c in s]
 
 
+def bool_arr_to_string(b):
+    return ''.join([str(1 if b else 0) for b in b])
+
+
 def extract_class_list(problem):
     classes: list = []
 
