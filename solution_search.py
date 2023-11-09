@@ -1,6 +1,6 @@
 import numpy as np
 
-from costCalcuation.clashes import clashes_close_downwards_option
+from costCalcuation.distributions.double_booking import DoubleBookingHelper
 from models.input.problem import Problem
 
 
@@ -62,7 +62,10 @@ class SolutionSearch:
             self.options_per_class[i] = max(len(c.room_options), 1) * len(c.time_options)
 
     def close_downwards_options(self, current_row, current_option):
-        mask = clashes_close_downwards_option(self, current_row, current_option)  # close other options in the same room
+        # mask = clashes_close_downwards_option(self, current_row, current_option)  # close other options in the same room
+        mask = np.zeros_like(self.decision_table, dtype=bool)
+
+        DoubleBookingHelper(self.problem).close_downwards_option(self, current_row, current_option, mask)
 
         for d in self.problem.distributions:
             if d.required and self.classes[current_row].id in d.class_ids:
