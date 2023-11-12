@@ -1,6 +1,7 @@
 import numpy as np
 
 from costCalcuation.distributions.create_distribtion_helper import create_helper_for_distribution
+from initial_timetable_treesearch_solver import InitialTimetableTreeSearchSolver
 from parse_input import parse_xml
 from penalty_calc import calculate_total_cost
 from solution_search import SolutionSearch
@@ -16,8 +17,8 @@ if __name__ == "__main__":
     debug_read_checkpoint = False
 
     # file_path = "input.xml"
-    file_path = "D:\\Downloads\\assignmentRedownload\\instances\\early\\agh-ggis-spr17.xml"
-    # file_path = "D:\\Downloads\\assignmentRedownload\\instances\\middle\\muni-fi-spr17.xml"
+    # file_path = "D:\\Downloads\\assignmentRedownload\\instances\\early\\agh-ggis-spr17.xml"
+    file_path = "D:\\Downloads\\assignmentRedownload\\instances\\middle\\muni-fi-spr17.xml"
     # file_path = "D:\\Downloads\\assignmentRedownload\\instances\\late\\muni-pdfx-fal17.xml"
 
     problem = parse_xml(file_path)
@@ -32,7 +33,8 @@ if __name__ == "__main__":
         costs = None
 
         search = SolutionSearch(problem)
-        search.solve()
+        solver = InitialTimetableTreeSearchSolver(search)
+        solver.solve()
         gene = search.get_result_as_gene()
 
         np.save("checkpoint", gene)

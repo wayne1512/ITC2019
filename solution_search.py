@@ -1,6 +1,5 @@
 import numpy as np
 
-from costCalcuation.distributions.double_booking import DoubleBookingHelper
 from models.input.problem import Problem
 
 
@@ -60,52 +59,6 @@ class SolutionSearch:
             self.classes_without_rooms[i] = len(c.room_options) == 0
 
             self.options_per_class[i] = max(len(c.room_options), 1) * len(c.time_options)
-
-    def close_downwards_options(self, current_row, current_option):
-        # mask = clashes_close_downwards_option(self, current_row, current_option)  # close other options in the same room
-        mask = np.zeros_like(self.decision_table, dtype=bool)
-
-        DoubleBookingHelper(self.problem).close_downwards_option(self, current_row, current_option, mask)
-
-        for d in self.problem.distributions:
-            if d.required and self.classes[current_row].id in d.class_ids:
-                d.distribution_helper.close_downwards_option(self, current_row, current_option, mask)
-
-        mask = mask & (self.decision_table == 0)
-        self.decision_table[mask] = (-current_row - 2)  # close
-
-    def solve(self):
-        current_row = 0
-
-        current_option = 0
-
-        while current_row < len(self.classes):
-            # check if there is any row where all the options are closed - in which case we are ready to backtrack
-            while np.any(np.all(self.decision_table[current_row:], axis=1)):
-                # backtrack
-                self.decision_table[self.decision_table <= (-current_row - 1)] = 0
-
-                print("backtrack from " + str(current_row) + " to " + str(current_row - 1))
-                current_row -= 1
-                option_to_close = np.where(self.decision_table[current_row] == 1)
-
-                self.decision_table[current_row][option_to_close] = (-current_row - 1)  # close previous row
-
-            #  class with least open options
-            next_class_offset = np.argmax(np.count_nonzero(self.decision_table[current_row:], axis=1))
-            swap_row = next_class_offset + current_row
-            self.swap_rows(current_row, swap_row)
-
-            open_options = np.where(self.decision_table[current_row] == 0)[0]
-            current_option = open_options[0]
-
-            self.decision_table[current_row, current_option] = 1
-
-            self.close_downwards_options(current_row, current_option)
-
-            print("proceeded from " + str(current_row) + " to " + str(current_row + 1))
-
-            current_row += 1
 
     def swap_rows(self, i1, i2):
         self.classes[i1], self.classes[i2] = self.classes[
