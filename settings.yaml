@@ -1,0 +1,5 @@
+input: 'D:\Downloads\assignmentRedownload\instances\early\muni-fi-spr16.xml'
+hyperparams:
+  population_size: 32
+  no_of_generations: 50
+
