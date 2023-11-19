@@ -32,6 +32,18 @@ class DoubleBookingHelper:
                 ):
                     violation_count += 1
 
+        return violation_count
+
+    def calculate_clashes(self, rooms_option_chosen_ids, time_option_chosen_ids):
+        classes = self.problem.classes
+        classes_index = range(len(classes))
+
+        time_options_chosen = [c.time_options[time_option_chosen_ids[idx]] for c, idx in zip(classes, classes_index)]
+        rooms_options_chosen = [c.room_options[rooms_option_chosen_ids[idx]] if len(c.room_options) > 0 else None for
+                                c, idx in zip(classes, classes_index)]
+
+        violation_count = self.count_violations(time_options_chosen, rooms_options_chosen)
+
         return violation_count, 0
 
     def close_options_for_checking_class(self, current_class, current_room_option, current_time_option, checking_class,
