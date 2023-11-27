@@ -25,7 +25,8 @@ class MaxDayLoadDistributionHelper:
         sum_extra_loads = np.sum(extra_load_per_day)
 
         if self.distribution.required:
-            return sum_extra_loads, 0
+            days_with_extra_load = np.count_nonzero(day_loads > self.max_load)
+            return days_with_extra_load, 0
         return 0, (sum_extra_loads * self.distribution.penalty) // self.problem.nrWeeks
 
     def close_downwards_option(self, solution_search, current_row, current_option, combined_closing_mask):
