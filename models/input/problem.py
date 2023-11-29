@@ -24,6 +24,18 @@ class Problem:
         self.__room_dict = {r.id: r for r in rooms}
         self.classes: Final = extract_class_list(self)
         self.__class_dict = {c.id: c for c in self.classes}
+        self.__class_id_to_subpart_dict = {}
+        self.__subpart_id_to_config_dict = {}
+        self.__config_id_to_course_dict = {}
+
+        for course in self.courses:
+            for config in course.configs:
+                self.__config_id_to_course_dict[config.id] = course
+                for subpart in config.subparts:
+                    self.__subpart_id_to_config_dict[subpart.id] = course
+                    for clazz in subpart.classes:
+                        self.__class_id_to_subpart_dict[clazz.id] = subpart
+
 
     def get_room_by_id(self, id):
         return self.__room_dict[id]
@@ -41,3 +53,17 @@ class Problem:
             return travel[0].value
 
         return 0
+
+    def get_subpart_by_class_id(self, class_id):
+        return self.__class_id_to_subpart_dict[class_id]
+
+    def get_config_by_subpart_id(self, subpart_id):
+        return self.__subpart_id_to_config_dict[subpart_id]
+
+    def get_course_by_config_id(self, config_id):
+        return self.__config_id_to_course_dict[config_id]
+
+    def get_course_by_class_id(self, class_id):
+        return self.get_course_by_config_id(
+            self.get_config_by_subpart_id(self.get_subpart_by_class_id(class_id).id).id
+        )
