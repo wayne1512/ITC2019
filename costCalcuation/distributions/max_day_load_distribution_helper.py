@@ -25,7 +25,8 @@ class MaxDayLoadDistributionHelper:
         sum_extra_loads = np.sum(extra_load_per_day)
 
         if self.distribution.required:
-            return sum_extra_loads, 0
+            days_with_extra_load = np.count_nonzero(day_loads > self.max_load)
+            return days_with_extra_load, 0
         return 0, (sum_extra_loads * self.distribution.penalty) // self.problem.nrWeeks
 
     def close_downwards_option(self, solution_search, current_row, current_option, combined_closing_mask):
@@ -48,7 +49,7 @@ class MaxDayLoadDistributionHelper:
 
         already_placed_time_options = []
         for c, checking_class_idx, in zip(already_placed_classes, index_of_already_placed_classes_in_search):
-            selected_option_of_checking_class = np.where(solution_search.decisionTable[checking_class_idx] == 1)[0][0]
+            selected_option_of_checking_class = np.where(solution_search.decision_table[checking_class_idx] == 1)[0][0]
             room_option_idx, time_option_idx = np.unravel_index(selected_option_of_checking_class, (
                 max(len(c.room_options), 1), len(c.time_options)))
 
