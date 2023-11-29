@@ -1,12 +1,12 @@
-from models.input.problem import Problem
 import xml.etree.ElementTree as ET
 
+from models.input.problem import Problem
 from models.input.roomOption import RoomOption
 from models.input.timeOption import TimeOption
 from util import bool_arr_to_string
 
 
-def generate_xml(problem: Problem, gene):
+def generate_xml(problem: Problem, gene, file_path="output.xml"):
     problem_node = ET.Element('solution', name=problem.name, runtime='0', cores='0', technique='hybrid', author='test',
                               institution='test1', country='Malta')
 
@@ -23,4 +23,4 @@ def generate_xml(problem: Problem, gene):
 
     tree = ET.ElementTree(problem_node)
     ET.indent(tree, "  ", 0)
-    tree.write(open("output.xml", 'wb'))
+    tree.write(open(file_path, 'wb'))

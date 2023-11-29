@@ -27,7 +27,7 @@ def select_parents_roulette_wheel(genes, costs):
 
 
 def crossover_uniform(gene1, gene2):
-    choice = np.random.rand(*gene1.shape) > 0.5
+    choice = np.random.rand(*gene1.shape) > 0.9
 
     stats = np.count_nonzero(choice)
 
