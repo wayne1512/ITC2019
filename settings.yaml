@@ -1,4 +1,4 @@
-input: 'D:\Downloads\assignmentRedownload\instances\early\muni-fi-spr16.xml'
+input: 'D:\Downloads\assignmentRedownload\instances\early\agh-fis-spr17.xml'
 solid_state: true
 hyperparams:
   population_size: 64

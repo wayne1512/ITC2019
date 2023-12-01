@@ -18,7 +18,7 @@ class Problem:
         self.optimization: Final = optimization
         self.rooms: Final = rooms
         self.courses: Final = courses
-        self.distributions: Final = distributions
+        self.distributions = distributions
         self.students: Final = students
 
         self.__room_dict = {r.id: r for r in rooms}

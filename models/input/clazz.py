@@ -11,3 +11,5 @@ class Clazz:
         self.time_options = time_options
 
         self.room_options_ids = [opt.id for opt in room_options]
+
+        self.closed_room_time_combinations = None
