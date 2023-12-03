@@ -1,11 +1,11 @@
-import pickle
-
 import numpy as np
 import yaml
 
 from costCalcuation.distributions.create_distribtion_helper import create_helper_for_distribution
+from genetic_operators.parent_selection import get_parent_selection_method
 from models.input.problem import Problem
 from parse_input import parse_xml
+from timetable_solver import TimetableSolver
 
 
 def pre_process(problem: Problem):
@@ -69,7 +69,6 @@ def pre_process(problem: Problem):
     print("removed", len(removed_time_options), "time options")
     print("removed", total_options_removed, "total room time combinations")
     print(remaining_closed_room_time_combinations, "closed room time combinations remaining")
-    pickle.dump(room_time_combinations_closed, open("main.p", "wb"))
 
 
 
@@ -86,8 +85,6 @@ if __name__ == "__main__":
 
     # pre-processing
     pre_process(problem)
-
-    exit()
 
     solid_state = settings['solid_state']
 
