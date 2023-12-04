@@ -99,6 +99,7 @@ class DoubleBookingHelper:
         for i in range(len(time_options_chosen)):
             i_room_option = rooms_options_chosen[i]
             i_room_id = i_room_option.id if i_room_option is not None else None
+
             for j in range(i + 1, len(time_options_chosen)):
 
                 j_room_option = rooms_options_chosen[j]

@@ -36,7 +36,7 @@ class TimetableSolver:
     def run(self):
         for generation in range(self.no_of_generations):
             if self.population is None:
-                self.population = [random_gene(self.maximum_genes) for _ in range(self.population_size)]
+                self.population = [random_gene(self.maximum_genes, self.problem) for _ in range(self.population_size)]
                 self.costs = [calculate_total_cost(self.problem, gene) for gene in self.population]
             else:
                 self.generate_new_population()
@@ -65,19 +65,21 @@ class TimetableSolver:
 
             selected_parents_indices = self.parent_selection.select(np.array(self.costs), self.population_size)
 
-            self.population = [self.crossover.crossover(self.population[p1], self.population[p2])[0] for (p1, p2) in
+            self.population = [self.crossover.crossover(self.population[p1], self.population[p2], self.problem)[0] for
+                               (p1, p2) in
                                selected_parents_indices]
 
-            self.population = [self.mutation.mutate(gene, self.maximum_genes) for gene in self.population]
+            self.population = [self.mutation.mutate(gene, self.maximum_genes, self.problem) for gene in self.population]
 
             self.costs = [calculate_total_cost(self.problem, gene) for gene in self.population]
         else:
             selected_parents_indices = self.parent_selection.select(np.array(self.costs), 1)[0]
 
             child = self.crossover.crossover(
-                self.population[selected_parents_indices[0]], self.population[selected_parents_indices[1]])[0]
+                self.population[selected_parents_indices[0]], self.population[selected_parents_indices[1]],
+                self.problem)[0]
 
-            child = self.mutation.mutate(child, self.maximum_genes)
+            child = self.mutation.mutate(child, self.maximum_genes, self.problem)
 
             child, cost_of_child = local_search(child, self.maximum_genes, self.problem)
             # cost_of_child = calculate_total_cost(self.problem, child)
