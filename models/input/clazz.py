@@ -11,3 +11,13 @@ class Clazz:
         self.time_options = time_options
 
         self.room_options_ids = [opt.id for opt in room_options]
+
+        self.closed_room_time_combinations = None
+
+        # pre-placed means that the class has been placed in a fixed room and time
+        # and the time has been added as an unavailable time for the room
+        # the double booking penalty for this class will be skipped
+        self.pre_placed = False
+
+    def is_fixed(self):
+        return len(self.room_options) <= 1 and len(self.time_options) == 1

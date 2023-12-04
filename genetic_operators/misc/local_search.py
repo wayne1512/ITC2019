@@ -31,8 +31,14 @@ def local_search_iteration(gene, max_gene, problem):
     for i in range(len(gene)):
         # change of room
         for j in range(max_gene[i, 0]):
+
+            if problem.classes[i].closed_room_time_combinations is not None and \
+                    problem.classes[i].closed_room_time_combinations[j, gene[i, 1]]:
+                continue  # if the room time combination is closed, skip checking it
+
             new_gene = gene.copy()
             new_gene[i, 0] = j
+
             new_gene_cost = edit_cost(editable_cost, new_gene, [i]).calculate_total()
 
             if new_gene_cost < best_gene_cost:
@@ -41,6 +47,11 @@ def local_search_iteration(gene, max_gene, problem):
 
         # change of time
         for j in range(max_gene[i, 1]):
+
+            if problem.classes[i].closed_room_time_combinations is not None and \
+                    problem.classes[i].closed_room_time_combinations[gene[i, 0], j]:
+                continue  # if the room time combination is closed, skip checking it
+
             new_gene = gene.copy()
             new_gene[i, 1] = j
             new_gene_cost = edit_cost(editable_cost, new_gene, [i]).calculate_total()
