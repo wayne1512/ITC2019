@@ -25,6 +25,11 @@ def random_gene(maximums, problem=None):
 
     if problem is not None:
         for i, c in enumerate(problem.classes):
+
+            if c.is_fixed():
+                r[i] = (0, 0)
+                continue
+
             # is not none handles classes with no rooms
             while c.closed_room_time_combinations is not None and \
                     c.closed_room_time_combinations[r[i, 0], r[i, 1]]:

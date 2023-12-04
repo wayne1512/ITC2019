@@ -4,6 +4,7 @@ import yaml
 from costCalcuation.distributions.create_distribtion_helper import create_helper_for_distribution
 from genetic_operators.parent_selection import get_parent_selection_method
 from models.input.problem import Problem
+from models.input.unavailability import Unavailability
 from parse_input import parse_xml
 from timetable_solver import TimetableSolver
 
@@ -23,11 +24,19 @@ def pre_process(problem: Problem):
     remaining_closed_room_time_combinations = 0
     total_options_removed = 0
 
-    room_time_combinations_closed = []
+    # when a class is fixed, set the room to be unavailable during that time
+    for c in problem.classes:
+        c.pre_placed = True
+        if c.is_fixed():
+            if len(c.room_options) == 1:
+                room = problem.get_room_by_id(c.room_options[0].id)
+                room.unavailabilities.append(Unavailability(c.time_options[0].days, c.time_options[0].start,
+                                                            c.time_options[0].length, c.time_options[0].weeks))
 
+    # close room time combinations when room is unavailable
     for c in problem.classes:
 
-        if len(c.room_options) == 0:
+        if len(c.room_options) == 0 or c.pre_placed:
             continue
 
         closed_room_time_combinations = np.zeros((len(c.room_options), len(c.time_options)), dtype=bool)
@@ -45,7 +54,6 @@ def pre_process(problem: Problem):
                             not np.any(np.logical_and(to.weeks, ru.weeks))
                     ):
                         closed_room_time_combinations[ro_index, to_index] = True
-                        room_time_combinations_closed.append((c, ro, to))
                         break
 
         rows_to_remove = np.all(closed_room_time_combinations, axis=1)
@@ -69,7 +77,6 @@ def pre_process(problem: Problem):
     print("removed", len(removed_time_options), "time options")
     print("removed", total_options_removed, "total room time combinations")
     print(remaining_closed_room_time_combinations, "closed room time combinations remaining")
-
 
 
 if __name__ == "__main__":
