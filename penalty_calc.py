@@ -1,11 +1,11 @@
 from numpy.typing import NDArray
 
 from costCalcuation.distributions.double_booking import DoubleBookingHelper
-from costCalcuation.distributions.unavailable_room import UnavailableRoomHelper
 from costCalcuation.room_option_penalty import calculate_room_option_penalties, \
     calculate_room_option_penalties_array, calculate_room_option_penalty_for_single_class
 from costCalcuation.time_option_penalty import calculate_time_option_penalties, \
     calculate_time_option_penalties_array, calculate_time_option_penalty_for_single_class
+from costCalcuation.unavailable_room import UnavailableRoomHelper
 from models.input.problem import Problem
 from util import sum_of_costs
 
@@ -60,11 +60,17 @@ def edit_cost(editable_penalties, gene: NDArray, changed_indexes):
     times_chosen_idx = gene[:, 1]
     time_penalties = editable_penalties.time_penalties.copy()
 
+    unavailable_room_penalties = editable_penalties.unavailable_room_penalties.copy()
+
+    unavailable_room_helper = UnavailableRoomHelper(editable_penalties.problem)
+
     for i in changed_indexes:
         room_penalties[i] = calculate_room_option_penalty_for_single_class(editable_penalties.problem.classes[i],
                                                                            rooms_chosen_idx[i])
         time_penalties[i] = calculate_time_option_penalty_for_single_class(editable_penalties.problem.classes[i],
                                                                            times_chosen_idx[i])
+        unavailable_room_penalties[i] = unavailable_room_helper.count_violation_for_single_class(
+            editable_penalties.problem.classes[i], rooms_chosen_idx[i], times_chosen_idx[i])
 
     changed_class_ids = [editable_penalties.problem.classes[i].id for i in changed_indexes]
 
@@ -72,11 +78,6 @@ def edit_cost(editable_penalties, gene: NDArray, changed_indexes):
     double_booking_penalties = double_booking_helper.edit_calculation(rooms_chosen_idx, times_chosen_idx,
                                                                       editable_penalties.double_booking_penalties.copy(),
                                                                       changed_indexes, changed_class_ids)
-    unavailable_room_helper = UnavailableRoomHelper(editable_penalties.problem)
-    unavailable_room_penalties = unavailable_room_helper.edit_calculation(rooms_chosen_idx, times_chosen_idx,
-                                                                          editable_penalties.unavailable_room_penalties
-                                                                          .copy(),
-                                                                          changed_indexes, changed_class_ids)
 
     dist_penalties_arr = editable_penalties.distribution_penalties.copy()
     for i, d in enumerate(editable_penalties.problem.distributions):
@@ -101,5 +102,5 @@ class EditablePenaltyCalculation:
     def calculate_total(self):
         return sum_of_costs([sum_of_costs(self.room_penalties), sum_of_costs(self.time_penalties),
                              (len(self.double_booking_penalties), 0),
-                             (len(self.unavailable_room_penalties), 0),
+                             sum_of_costs(self.unavailable_room_penalties),
                              sum_of_costs(self.distribution_penalties)])

@@ -10,4 +10,4 @@ class UniformMutation:
 
     def mutate(self, gene, max_gene, problem):
         choice = np.random.rand(*gene.shape) < self.chance
-        return np.where(choice, gene, random_gene(max_gene, problem))
+        return np.where(choice, random_gene(max_gene, problem), gene)

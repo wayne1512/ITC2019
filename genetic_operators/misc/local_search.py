@@ -1,3 +1,5 @@
+import time
+
 from penalty_calc import calculate_editable_cost, edit_cost
 
 
@@ -18,6 +20,7 @@ def local_search(gene, max_gene, problem, max_iter=25):
 
     print("after local search: ", best_gene_cost)
 
+
     return best_gene, best_gene_cost
 
 
@@ -27,6 +30,8 @@ def local_search_iteration(gene, max_gene, problem):
     best_gene = gene
     best_gene_cost = editable_cost.calculate_total()
     print("before local search iter: ", best_gene_cost)
+
+    start_time = time.time()
 
     for i in range(len(gene)):
         # change of room
@@ -60,5 +65,6 @@ def local_search_iteration(gene, max_gene, problem):
                 best_gene_cost = new_gene_cost
 
     print("after local search iter: ", best_gene_cost)
+    print("local search iter time: ", time.time() - start_time)
 
     return best_gene, best_gene_cost
