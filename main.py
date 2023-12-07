@@ -1,6 +1,9 @@
+import uuid
+
 import numpy as np
 import yaml
 
+from checkpoint_manager import CheckpointManager
 from costCalcuation.distributions.create_distribtion_helper import create_helper_for_distribution
 from genetic_operators.parent_selection import get_parent_selection_method
 from models.input.problem import Problem
@@ -26,8 +29,8 @@ def pre_process(problem: Problem):
 
     # when a class is fixed, set the room to be unavailable during that time
     for c in problem.classes:
-        c.pre_placed = True
         if c.is_fixed():
+            c.pre_placed = True
             if len(c.room_options) == 1:
                 room = problem.get_room_by_id(c.room_options[0].id)
                 room.unavailabilities.append(Unavailability(c.time_options[0].days, c.time_options[0].start,
@@ -81,34 +84,47 @@ def pre_process(problem: Problem):
 
 if __name__ == "__main__":
 
-    settings_file = open("settings.yaml", "r")
-    settings = yaml.safe_load(settings_file)
+    checkpoint_dir = "checkpoints/a407b4c186914d1f82757581f57cbd57/"
+    # checkpoint_dir = ""
 
-    file_path = settings['input']
-    problem = parse_xml(file_path)
+    if checkpoint_dir is not None and checkpoint_dir != "":
+        solver = CheckpointManager(checkpoint_dir).load_solver()
+        print("loaded checkpoint from", checkpoint_dir)
+    else:
 
-    for d in problem.distributions:
-        d.distribution_helper = create_helper_for_distribution(problem, d)
+        settings_file = open("settings.yaml", "r")
+        settings = yaml.safe_load(settings_file)
 
-    # pre-processing
-    pre_process(problem)
+        file_path = settings['input']
+        problem = parse_xml(file_path)
 
-    solid_state = settings['solid_state']
+        for d in problem.distributions:
+            d.distribution_helper = create_helper_for_distribution(problem, d)
 
-    population_size = settings['hyperparams']['population_size']
-    no_of_generations = settings['hyperparams']['no_of_generations']
+        # pre-processing
+        pre_process(problem)
 
-    parent_selection = get_parent_selection_method(settings['hyperparams']['parent_selection'])
+        solid_state = settings['solid_state']
 
-    mutation_chance = settings['hyperparams']['mutation_chance']
-    crossover_ration = settings['hyperparams']['crossover_ratio']
+        population_size = settings['hyperparams']['population_size']
+        no_of_generations = settings['hyperparams']['no_of_generations']
 
-    solver = TimetableSolver(problem,
-                             solid_state=solid_state,
-                             no_of_generations=no_of_generations,
-                             population_size=population_size,
-                             parent_selection=parent_selection,
-                             mutation_chance=mutation_chance,
-                             )
+        parent_selection = get_parent_selection_method(settings['hyperparams']['parent_selection'])
+
+        mutation_chance = settings['hyperparams']['mutation_chance']
+        crossover_ration = settings['hyperparams']['crossover_ratio']
+
+        checkpoint_dir = "checkpoints/" + uuid.uuid4().hex + "/"
+
+        solver = TimetableSolver(problem,
+                                 solid_state=solid_state,
+                                 no_of_generations=no_of_generations,
+                                 population_size=population_size,
+                                 parent_selection=parent_selection,
+                                 mutation_chance=mutation_chance,
+                                 checkpoint_dir=checkpoint_dir,
+                                 )
+        print("checkpoints will be saved to", checkpoint_dir)
+
 
     solver.run()

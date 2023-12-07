@@ -1,5 +1,4 @@
 import numpy as np
-import pandas as pd
 
 
 class UnavailableRoomHelper:
@@ -36,9 +35,9 @@ class UnavailableRoomHelper:
 
         return violation_count
 
-    def count_violations_editable(self, time_options_chosen, rooms_options_chosen):
+    def count_violations_array(self, time_options_chosen, rooms_options_chosen):
 
-        violations = []
+        result = np.zeros((len(self.problem.classes), 2), dtype=int)
 
         for i in range(len(time_options_chosen)):
 
@@ -60,37 +59,30 @@ class UnavailableRoomHelper:
                             not np.any(np.logical_and(time_option.days, ru.days)) or
                             not np.any(np.logical_and(time_option.weeks, ru.weeks))
                     ):
-                        violations.append({'class': i})
+                        result[i] = 1, 0
+        return result
 
-        return pd.DataFrame(violations, columns=['class'])
+    def count_violation_for_single_class(self, clazz, rooms_options_chosen_index, time_options_chosen_index):
+        if clazz.pre_placed or rooms_options_chosen_index < 0:
+            return 0, 0
 
-    def count_violations_relating_to_classes(self, rooms_options_chosen, time_options_chosen, indexes):
-        violations = []
+        room_option = clazz.room_options[rooms_options_chosen_index]
+        time_option = clazz.time_options[time_options_chosen_index]
 
-        for i in indexes:
-            for i in range(len(time_options_chosen)):
+        if room_option is not None:
+            room = self.problem.get_room_by_id(room_option.id)
+            room_unavailabilities = room.unavailabilities
 
-                clazz = self.problem.classes[i]
-                if clazz.pre_placed:
-                    continue
+            for ru in room_unavailabilities:
+                if not (
+                        time_option.start >= (ru.start + ru.length) or
+                        ru.start >= (time_option.start + time_option.length) or
+                        not np.any(np.logical_and(time_option.days, ru.days)) or
+                        not np.any(np.logical_and(time_option.weeks, ru.weeks))
+                ):
+                    return 1, 0
 
-                room_option = rooms_options_chosen[i]
-                time_option = time_options_chosen[i]
-
-                if room_option is not None:
-                    room = self.problem.get_room_by_id(room_option.id)
-                    room_unavailabilities = room.unavailabilities
-
-                    for ru in room_unavailabilities:
-                        if not (
-                                time_option.start >= (ru.start + ru.length) or
-                                ru.start >= (time_option.start + time_option.length) or
-                                not np.any(np.logical_and(time_option.days, ru.days)) or
-                                not np.any(np.logical_and(time_option.weeks, ru.weeks))
-                        ):
-                            violations.append({'class': i})
-
-        return pd.DataFrame(violations)
+        return 0, 0
 
     def calculate_clashes(self, rooms_option_chosen_ids, time_option_chosen_ids):
         classes = self.problem.classes
@@ -112,23 +104,6 @@ class UnavailableRoomHelper:
         rooms_options_chosen = [c.room_options[rooms_option_chosen_ids[idx]] if len(c.room_options) > 0 else None for
                                 c, idx in zip(classes, classes_index)]
 
-        violations = self.count_violations_editable(time_options_chosen, rooms_options_chosen)
+        violations = self.count_violations_array(time_options_chosen, rooms_options_chosen)
 
         return violations
-
-    def edit_calculation(self, rooms_option_chosen_ids, time_option_chosen_ids, violations, changed_indexes,
-                         changed_class_ids):
-
-        classes = self.problem.classes
-        classes_index = range(len(classes))
-
-        time_options_chosen = [c.time_options[time_option_chosen_ids[idx]] for c, idx in zip(classes, classes_index)]
-        rooms_options_chosen = [c.room_options[rooms_option_chosen_ids[idx]] if len(c.room_options) > 0 else None for
-                                c, idx in zip(classes, classes_index)]
-
-        filtered_df = violations[~violations['class'].isin(changed_indexes)].copy()
-
-        new_violations = self.count_violations_relating_to_classes(rooms_options_chosen, time_options_chosen,
-                                                                   changed_indexes)
-
-        return pd.concat([filtered_df, new_violations])

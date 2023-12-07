@@ -1,6 +1,7 @@
 import numpy as np
 from matplotlib import pyplot as plt
 
+from checkpoint_manager import CheckpointManager
 from genetic_operators.crossover import UniformCrossover
 from genetic_operators.misc.local_search import local_search
 from genetic_operators.mutation.uniform_mutation import UniformMutation
@@ -17,7 +18,8 @@ class TimetableSolver:
                  population_size=64,
                  parent_selection=RandomParentSelection(),
                  mutation_chance=0.001,
-                 crossover_ratio=0.1):
+                 crossover_ratio=0.1,
+                 checkpoint_dir=None):
         self.solid_state = solid_state
         self.problem = problem
         self.no_of_generations = no_of_generations
@@ -26,6 +28,9 @@ class TimetableSolver:
         self.mutation_chance = mutation_chance
         self.crossover_ratio = crossover_ratio
 
+        self.checkpoint_dir = checkpoint_dir
+        self.checkpoint_manager = CheckpointManager(checkpoint_dir)
+
         self.population = None
         self.costs = None
         self.maximum_genes = get_gene_maximums(self.problem.classes)
@@ -33,15 +38,17 @@ class TimetableSolver:
         self.mutation = UniformMutation(mutation_chance)
         self.crossover = UniformCrossover(crossover_ratio)
 
+        self.generation = 0
+
     def run(self):
-        for generation in range(self.no_of_generations):
+        while self.generation < self.no_of_generations:
             if self.population is None:
                 self.population = [random_gene(self.maximum_genes, self.problem) for _ in range(self.population_size)]
                 self.costs = [calculate_total_cost(self.problem, gene) for gene in self.population]
             else:
                 self.generate_new_population()
 
-            if generation % 1 == 0 or generation == self.no_of_generations - 1:
+            if self.generation % 1 == 0 or self.generation == self.no_of_generations - 1:
                 x = np.arange(self.population_size)
                 fig, ax1 = plt.subplots()
 
@@ -55,9 +62,12 @@ class TimetableSolver:
                 ax1.legend(loc='upper left')
                 ax2.legend(loc='upper right')
 
-                plt.title("generation " + str(generation))
+                plt.title("generation " + str(self.generation))
 
                 plt.show()
+
+            self.generation += 1
+            self.checkpoint_manager.save_solver(self)
 
     def generate_new_population(self):
 
