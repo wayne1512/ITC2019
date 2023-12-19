@@ -85,7 +85,7 @@ def pre_process(problem: Problem):
 if __name__ == "__main__":
 
     checkpoint_dir = "checkpoints/a407b4c186914d1f82757581f57cbd57/"
-    # checkpoint_dir = ""
+    checkpoint_dir = ""
 
     if checkpoint_dir is not None and checkpoint_dir != "":
         solver = CheckpointManager(checkpoint_dir).load_solver()

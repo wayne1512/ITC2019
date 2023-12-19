@@ -1,9 +1,9 @@
 import numpy as np
+import pandas as pd
 from matplotlib import pyplot as plt
 
 from checkpoint_manager import CheckpointManager
 from genetic_operators.crossover import UniformCrossover
-from genetic_operators.misc.local_search import local_search
 from genetic_operators.mutation.uniform_mutation import UniformMutation
 from genetic_operators.parent_selection import RandomParentSelection
 from penalty_calc import calculate_total_cost
@@ -40,6 +40,23 @@ class TimetableSolver:
 
         self.generation = 0
 
+        self.fitness_history = pd.DataFrame(columns=['generation', 'hard_cost', 'soft_cost'])
+
+        # Initialize the figures and axes for the plots
+        self.fig, self.ax = plt.subplots()
+        self.line1, = self.ax.plot([], [], linewidth=2, label='hard', color='r')
+        self.line2, = self.ax.plot([], [], linewidth=2, label='soft', color='b')
+        self.ax.legend(loc='upper left')
+
+        # Initialize the figures and axes for the fitness plot
+        self.fitness_fig, self.fitness_ax_hard = plt.subplots()
+        self.fitness_ax_soft = self.fitness_ax_hard.twinx()
+        self.fitness_ax_hard.set_xlabel('generation')
+        self.fitness_line1, = self.fitness_ax_hard.plot([], [], linewidth=2, label='hard', color='r')
+        self.fitness_line2, = self.fitness_ax_soft.plot([], [], linewidth=2, label='soft', color='b')
+        self.fitness_ax_hard.legend(loc='upper left')
+        self.fitness_ax_soft.legend(loc='upper right')
+
     def run(self):
         while self.generation < self.no_of_generations:
             if self.population is None:
@@ -50,21 +67,33 @@ class TimetableSolver:
 
             if self.generation % 1 == 0 or self.generation == self.no_of_generations - 1:
                 x = np.arange(self.population_size)
-                fig, ax1 = plt.subplots()
+                self.line1.set_data(x, [cost[0] for cost in self.costs])
+                self.line2.set_data(x, [cost[1] for cost in self.costs])
 
-                ax1.plot(x, [cost[0] for cost in self.costs], linewidth=2, label='hard', color='r')
+                # Update the limits
+                self.ax.set_xlim(0, max(x))
+                self.ax.set_ylim(0, max([cost[0] for cost in self.costs]))
 
-                ax2 = ax1.twinx()
+                # Redraw the figure
+                self.fig.canvas.draw()
+                self.fig.canvas.flush_events()
+                plt.pause(0.01)
 
-                ax2.plot(x, [cost[1] for cost in self.costs], linewidth=2, label='soft', color='b')
+                if self.generation > 0:
+                    # Update the fitness plot
+                    self.fitness_line1.set_data(self.fitness_history['generation'], self.fitness_history['hard_cost'])
+                    self.fitness_line2.set_data(self.fitness_history['generation'], self.fitness_history['soft_cost'])
 
-                # Adding legends
-                ax1.legend(loc='upper left')
-                ax2.legend(loc='upper right')
+                    # Update the limits
+                    self.fitness_ax_hard.set_xlim(0, max(self.fitness_history['generation']))
+                    self.fitness_ax_hard.set_ylim(0, max(self.fitness_history['hard_cost']))
+                    self.fitness_ax_soft.set_xlim(0, max(self.fitness_history['generation']))
+                    self.fitness_ax_soft.set_ylim(0, max(self.fitness_history['soft_cost']))
 
-                plt.title("generation " + str(self.generation))
-
-                plt.show()
+                    # Redraw the fitness figure
+                    self.fitness_fig.canvas.draw()
+                    self.fitness_fig.canvas.flush_events()
+                    plt.pause(0.01)
 
             self.generation += 1
             self.checkpoint_manager.save_solver(self)
@@ -91,10 +120,14 @@ class TimetableSolver:
 
             child = self.mutation.mutate(child, self.maximum_genes, self.problem)
 
-            child, cost_of_child = local_search(child, self.maximum_genes, self.problem)
-            # cost_of_child = calculate_total_cost(self.problem, child)
+            # child, cost_of_child = local_search(child, self.maximum_genes, self.problem)
+            cost_of_child = calculate_total_cost(self.problem, child)
 
             worst_cost_index = np.lexsort((np.array(self.costs)[:, 1], np.array(self.costs)[:, 0]))[-1]
             if self.costs[worst_cost_index] > cost_of_child:
                 self.population[worst_cost_index] = child
                 self.costs[worst_cost_index] = cost_of_child
+
+            self.fitness_history = pd.concat([self.fitness_history,
+                                              pd.DataFrame([[self.generation, cost_of_child[0], cost_of_child[1]]],
+                                                           columns=['generation', 'hard_cost', 'soft_cost'])])
