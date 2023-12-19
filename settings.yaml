@@ -2,7 +2,7 @@ input: 'D:\Downloads\assignmentRedownload\instances\early\muni-fi-spr16.xml'
 solid_state: true
 hyperparams:
   population_size: 32
-  no_of_generations: 100
+  no_of_generations: 1000000000
   parent_selection: roulette
   mutation_chance: 0.005
   crossover_ratio: 0.01
