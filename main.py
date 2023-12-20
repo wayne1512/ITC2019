@@ -104,7 +104,7 @@ if __name__ == "__main__":
         # pre-processing
         pre_process(problem)
 
-        solid_state = settings['solid_state']
+        steady_state = settings['steady_state']
 
         population_size = settings['hyperparams']['population_size']
         no_of_generations = settings['hyperparams']['no_of_generations']
@@ -117,7 +117,7 @@ if __name__ == "__main__":
         checkpoint_dir = "checkpoints/" + uuid.uuid4().hex + "/"
 
         solver = TimetableSolver(problem,
-                                 solid_state=solid_state,
+                                 steady_state=steady_state,
                                  no_of_generations=no_of_generations,
                                  population_size=population_size,
                                  parent_selection=parent_selection,

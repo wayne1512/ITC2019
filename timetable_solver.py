@@ -13,14 +13,14 @@ from util import get_gene_maximums, random_gene
 class TimetableSolver:
 
     def __init__(self, problem,
-                 solid_state=False,
+                 steady_state=False,
                  no_of_generations=1000,
                  population_size=64,
                  parent_selection=RandomParentSelection(),
                  mutation_chance=0.001,
                  crossover_ratio=0.1,
                  checkpoint_dir=None):
-        self.solid_state = solid_state
+        self.steady_state = steady_state
         self.problem = problem
         self.no_of_generations = no_of_generations
         self.population_size = population_size
@@ -100,7 +100,7 @@ class TimetableSolver:
 
     def generate_new_population(self):
 
-        if not self.solid_state:
+        if not self.steady_state:
 
             selected_parents_indices = self.parent_selection.select(np.array(self.costs), self.population_size)
 
