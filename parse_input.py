@@ -1,3 +1,4 @@
+from collections import Counter
 from xml.etree import ElementTree as ET
 
 import numpy as np
@@ -222,7 +223,20 @@ def parse_itc2007_post_enrolment(file_path) -> Problem:
     # HC5 - Where specified, events should be scheduled to occur in the correct order in the week.
     hc5_distributions = [Distribution("Precedence", True, None, [i, j]) for i, j in np.argwhere(before_matrix == 1)]
 
-    distributions = hc1_distributions + hc5_distributions
+    # this allows us to group together students that are taking the same exact courses
+    # and only do 1 distribution for all of them
+    students_course_tuple_list = [tuple(s.course_ids) for s in students]
+    students_course_list_counter = Counter(students_course_tuple_list)
+
+    # SC2 - Students should not have to attend three (or more) events in successive timeslots occurring in the same day;
+    sc2_distributions = [Distribution("ITC2007MaxConsecutive(2)", False, count, list(lst))
+                         for lst, count in students_course_list_counter.items()]
+
+    # SC3 - Students should not be required to attend only one event in a particular day.
+    sc3_distributions = [Distribution("ITC2007MinDayLoad(2)", False, count, list(lst))
+                         for lst, count in students_course_list_counter.items()]
+
+    distributions = hc1_distributions + hc5_distributions + sc2_distributions + sc3_distributions
 
     problem = Problem(
         "ITC2007",

@@ -112,6 +112,7 @@ class TimetableSolver:
             self.population = [self.mutation.mutate(gene, self.maximum_genes) for gene in self.population]
 
             self.costs = [calculate_total_cost(self.problem, gene) for gene in self.population]
+
         else:
             selected_parents_indices = self.parent_selection.select(np.array(self.costs), 1)[0]
 

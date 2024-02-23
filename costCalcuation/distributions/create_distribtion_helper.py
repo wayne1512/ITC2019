@@ -1,5 +1,8 @@
 import re
 
+from costCalcuation.distributions.ITC2007_max_consecutive_distribution_helper import \
+    ITC2007MaxConsecutiveDistributionHelper
+from costCalcuation.distributions.ITC2007_min_day_load_distribution_helper import ITC2007MinDayLoadDistributionHelper
 from costCalcuation.distributions.different_days_distribution_helper import DifferentDaysDistributionHelper
 from costCalcuation.distributions.different_room_distribution_helper import DifferentRoomDistributionHelper
 from costCalcuation.distributions.different_time_distribution_helper import DifferentTimeDistributionHelper
@@ -26,6 +29,7 @@ from models.input.problem import Problem
 
 def create_helper_for_distribution(problem: Problem, distribution: Distribution):
     dist_type = distribution.type
+
     if dist_type == "SameStart":
         return SameStartDistributionHelper(problem, distribution)
 
@@ -88,5 +92,13 @@ def create_helper_for_distribution(problem: Problem, distribution: Distribution)
     match = re.search("MaxBlock\\((\\d+),(\\d+)\\)", dist_type)
     if match is not None:
         return MaxBlockDistributionHelper(problem, distribution, int(match.group(1)), int(match.group(2)))
+
+    match = re.search("ITC2007MaxConsecutive\\((\\d+)\\)", dist_type)
+    if match is not None:
+        return ITC2007MaxConsecutiveDistributionHelper(problem, distribution, int(match.group(1)))
+
+    match = re.search("ITC2007MinDayLoad\\((\\d+)\\)", dist_type)
+    if match is not None:
+        return ITC2007MinDayLoadDistributionHelper(problem, distribution, int(match.group(1)))
 
     return NotImplementedDistributionHelper(problem, distribution)
