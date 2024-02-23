@@ -122,6 +122,153 @@ def parse_xml(file_path) -> Problem:
     return problem
 
 
+def parse_itc2007_curriculum_based(file_path) -> Problem:
+    input_file = open(file_path, "r")
+
+    name = next(input_file).strip().split()[1]
+    course_count = int(next(input_file).strip().split()[1])
+    room_count = int(next(input_file).strip().split()[1])
+    days = int(next(input_file).strip().split()[1])
+    periods_per_day = int(next(input_file).strip().split()[1])
+    curricula_count = int(next(input_file).strip().split()[1])
+    constraint_count = int(next(input_file).strip().split()[1])
+
+    while next(input_file).strip() != "COURSES:":
+        pass
+
+    raw_courses = [next(input_file).strip().split() for _ in range(course_count)]
+
+    while next(input_file).strip() != "ROOMS:":
+        pass
+
+    raw_rooms = [next(input_file).strip().split() for _ in range(room_count)]
+
+    while next(input_file).strip() != "CURRICULA:":
+        pass
+
+    raw_curricula = [next(input_file).strip().split() for _ in range(curricula_count)]
+
+    while next(input_file).strip() != "UNAVAILABILITY_CONSTRAINTS:":
+        pass
+
+    raw_constraints = [next(input_file).strip().split() for _ in range(constraint_count)]
+
+    raw_room_id_to_room_id = {}
+    rooms = []
+
+    for i, raw_room in enumerate(raw_rooms):
+        raw_room_id = raw_room[0]
+        capacity = int(raw_room[1])
+        travel_times = []
+        unavailabilities = []
+        raw_room_id_to_room_id[raw_room_id] = i
+        rooms.append(Room(i, capacity, travel_times, unavailabilities))
+
+    unavailabilities_per_course = {}
+    for raw_constraint in raw_constraints:
+        course_id = raw_constraint[0]
+        day = int(raw_constraint[1])
+        period = int(raw_constraint[2])
+
+        if course_id not in unavailabilities_per_course:
+            unavailabilities_per_course[course_id] = []
+
+        unavailabilities_per_course[course_id].append((day, period))
+
+    raw_course_id_to_class_ids = {}
+    teachers_to_class_ids = {}
+    next_class_id = 0
+
+    courses = []
+
+    sc2_distributions = []
+    sc4_distributions = []
+
+    for i, raw_course in enumerate(raw_courses):
+        course_id = raw_course[0]
+        teacher = raw_course[1]
+        nr_of_lectures = int(raw_course[2])
+        min_working_days = int(raw_course[3])
+        nr_of_students = int(raw_course[4])
+
+        class_ids = []
+        classes = []
+
+        for j in range(nr_of_lectures):
+            clazz_id = next_class_id
+            next_class_id += 1
+            class_ids.append(clazz_id)
+
+            room_options = []
+            for room_id in range(room_count):
+                # SC1 - , the number of students that attend the course must be less or equal than the number
+                # of seats of all the rooms that host its lectures
+                room_options.append(RoomOption(room_id, max(0, nr_of_students - rooms[room_id].capacity)))
+
+            time_options = []
+            for day in range(days):
+                for period in range(periods_per_day):
+                    if not (day, period) in unavailabilities_per_course.get(course_id, []):
+                        time_options.append(TimeOption(np.arange(days) == day, period, 1, [True], 0))
+
+            classes.append(Clazz(clazz_id, nr_of_students, None, room_options, time_options))
+
+        courses.append(
+            Course(course_id, [Config(i, [Subpart(i, classes)])]))
+
+        raw_course_id_to_class_ids[course_id] = class_ids
+
+        # SC2 - The lectures of each course must be spread into the given minimum number of days.
+        # Each day below the minimum counts as 5 points of penalty.
+        sc2_distributions.append(Distribution(f"ITC2007MinDays({str(min_working_days)})", False, 5, class_ids))
+
+        # SC4 - All lectures of a course should be given in the same room.
+        # Each distinct room used for the lectures of a course, but the first, counts as 1 point of penalty.
+        sc4_distributions.append(Distribution("ITC2007SameRoom", False, 1, class_ids))
+
+        if teacher not in teachers_to_class_ids:
+            teachers_to_class_ids[teacher] = class_ids.copy()
+        teachers_to_class_ids[teacher] = teachers_to_class_ids[raw_course[1]] + class_ids.copy()
+
+    # HC3 - Lectures of courses in the same curriculum or taught by the same teacher must be all
+    # scheduled in different periods
+
+    # SC3 - Lectures belonging to a curriculum should be adjacent to each other (i.e., in consecutive periods).
+    # For a given curriculum, we account for a violation every time there is one lecture not adjacent
+    # to any other lecture within the same day. Each isolated lecture in a curriculum counts as 2 points of penalty.
+
+    hc3_distributions_teachers = [Distribution("NonOverlap", True, None, class_ids)
+                                  for teacher, class_ids in teachers_to_class_ids.items() if len(class_ids) > 1]
+    hc3_distributions_curriculum = []
+
+    sc3_distributions = []
+
+    for raw_curriculum in raw_curricula:
+        curriculum_id = raw_curriculum[0]
+        class_ids = []
+        for course_id in raw_curriculum[2:]:
+            class_ids += raw_course_id_to_class_ids[course_id]
+        hc3_distributions_curriculum.append(Distribution("NonOverlap", True, None, class_ids))
+        hc3_distributions_curriculum.append(Distribution("ITC2007NotIsolated", False, 2, class_ids))
+
+    distributions = (hc3_distributions_teachers + hc3_distributions_curriculum +
+                     sc2_distributions + sc3_distributions + sc4_distributions)
+
+    problem = Problem(
+        name,
+        days,
+        periods_per_day,
+        1,
+        Optimization(1, 1, 1, 1),
+        rooms,
+        courses,
+        distributions,
+        []
+    )
+
+    return problem
+
+
 def parse_itc2007_post_enrolment(file_path) -> Problem:
     input_file = open(file_path, "r")
 
