@@ -8,7 +8,7 @@ from costCalcuation.distributions.create_distribtion_helper import create_helper
 from genetic_operators.parent_selection import get_parent_selection_method
 from models.input.problem import Problem
 from models.input.unavailability import Unavailability
-from parse_input import parse_xml
+from parse_input import parse_itc2007_post_enrolment
 from timetable_solver import TimetableSolver
 
 
@@ -96,7 +96,8 @@ if __name__ == "__main__":
         settings = yaml.safe_load(settings_file)
 
         file_path = settings['input']
-        problem = parse_xml(file_path)
+        # problem = parse_xml(file_path)
+        problem = parse_itc2007_post_enrolment("D:\\Desktop\\post\\comp-2007-2-1.tim")
 
         for d in problem.distributions:
             d.distribution_helper = create_helper_for_distribution(problem, d)

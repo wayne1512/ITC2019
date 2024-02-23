@@ -4,6 +4,7 @@ from matplotlib import pyplot as plt
 
 from checkpoint_manager import CheckpointManager
 from genetic_operators.crossover import UniformCrossover
+from genetic_operators.misc.local_search import local_search
 from genetic_operators.mutation.uniform_mutation import UniformMutation
 from genetic_operators.parent_selection import RandomParentSelection
 from penalty_calc import calculate_total_cost
@@ -119,8 +120,8 @@ class TimetableSolver:
 
             child = self.mutation.mutate(child, self.maximum_genes)
 
-            # child, cost_of_child = local_search(child, self.maximum_genes, self.problem)
-            cost_of_child = calculate_total_cost(self.problem, child)
+            child, cost_of_child = local_search(child, self.maximum_genes, self.problem)
+            # cost_of_child = calculate_total_cost(self.problem, child)
 
             worst_cost_index = np.lexsort((np.array(self.costs)[:, 1], np.array(self.costs)[:, 0]))[-1]
             if self.costs[worst_cost_index] > cost_of_child:
