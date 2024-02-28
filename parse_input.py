@@ -1,4 +1,5 @@
 from collections import Counter
+from typing import Tuple
 from xml.etree import ElementTree as ET
 
 import numpy as np
@@ -20,13 +21,23 @@ from util import bool_string_to_bool_arr
 
 
 # Parse the XML file into objects
-def parse_xml(file_path) -> Problem:
+def parse_xml(file_path) -> Tuple[Problem, dict]:
+    statistics = {}
+
     tree = ET.parse(file_path)
     root = tree.getroot()
+
+    statistics["name"] = root.get("name")
 
     students_elem = root.find("students")
     students = [Student(int(student.get("id")), [int(course.get("id")) for course in student.findall("course")]) for
                 student in students_elem.findall("student")]
+    statistics["student_count"] = len(students)
+
+    if len(students) > 0:
+        statistics["avg_courses_per_student"] = np.mean([len(student.course_ids) for student in students])
+    else:
+        statistics["avg_courses_per_student"] = np.nan
 
     distributions_elem = root.find("distributions")
     distributions = [Distribution(distribution.get("type"),
@@ -34,6 +45,15 @@ def parse_xml(file_path) -> Problem:
                                   int(distribution.get("penalty") or 0),
                                   [int(clas.get("id")) for clas in distribution.findall("class")])
                      for distribution in distributions_elem.findall("distribution")]
+    statistics["distribution_count"] = len(distributions)
+    statistics["avg_classes_per_distribution"] = np.mean([len(distribution.class_ids)
+                                                          for distribution in distributions])
+    statistics["avg_penalty_per_soft_distribution"] = np.mean([distribution.penalty for distribution in distributions
+                                                               if not distribution.required])
+    statistics["hard_distribution_count"] = len([distribution for distribution in distributions
+                                                 if distribution.required])
+    statistics["soft_distribution_count"] = len([distribution for distribution in distributions
+                                                 if not distribution.required])
 
     rooms_elem = root.find("rooms")
     rooms = [Room(
@@ -53,6 +73,8 @@ def parse_xml(file_path) -> Problem:
             for unavailability in room.findall("unavailable")
         ]
     ) for room in rooms_elem.findall("room")]
+
+    statistics["room_count"] = len(rooms)
 
     courses_elem = root.find("courses")
     courses = [
@@ -99,6 +121,10 @@ def parse_xml(file_path) -> Problem:
         for course in courses_elem.findall("course")
     ]
 
+    statistics["course_count"] = len(courses)
+    statistics["class_count"] = sum(
+        [len(subpart.classes) for course in courses for config in course.configs for subpart in config.subparts])
+
     optimization_elem = root.find("optimization")
     optimization = Optimization(
         int(optimization_elem.get("time")),
@@ -119,10 +145,16 @@ def parse_xml(file_path) -> Problem:
         students
     )
 
-    return problem
+    statistics["nrDays"] = int(root.get("nrDays"))
+    statistics["slotsPerDay"] = int(root.get("slotsPerDay"))
+    statistics["nrWeeks"] = int(root.get("nrWeeks"))
+
+    return problem, statistics
 
 
-def parse_itc2007_curriculum_based(file_path) -> Problem:
+def parse_itc2007_curriculum_based(file_path) -> Tuple[Problem, dict]:
+    statistics = {}
+
     input_file = open(file_path, "r")
 
     name = next(input_file).strip().split()[1]
@@ -132,6 +164,14 @@ def parse_itc2007_curriculum_based(file_path) -> Problem:
     periods_per_day = int(next(input_file).strip().split()[1])
     curricula_count = int(next(input_file).strip().split()[1])
     constraint_count = int(next(input_file).strip().split()[1])
+
+    statistics["name"] = name
+    statistics["course_count"] = course_count
+    statistics["room_count"] = room_count
+    statistics["days"] = days
+    statistics["periods_per_day"] = periods_per_day
+    statistics["curricula_count"] = curricula_count
+    statistics["constraint_count"] = constraint_count
 
     while next(input_file).strip() != "COURSES:":
         pass
@@ -175,6 +215,10 @@ def parse_itc2007_curriculum_based(file_path) -> Problem:
 
         unavailabilities_per_course[course_id].append((day, period))
 
+    statistics["average_unavailabilities_per_course"] = (
+            np.sum([len(unavailabilities) for unavailabilities in unavailabilities_per_course.values()])
+            / course_count)
+
     raw_course_id_to_class_ids = {}
     teachers_to_class_ids = {}
     next_class_id = 0
@@ -183,6 +227,9 @@ def parse_itc2007_curriculum_based(file_path) -> Problem:
 
     sc2_distributions = []
     sc4_distributions = []
+
+    statistics["lecture_count"] = (np.sum([int(raw_course[2]) for raw_course in raw_courses]))
+    statistics["average_lectures_per_course"] = statistics["lecture_count"] / course_count
 
     for i, raw_course in enumerate(raw_courses):
         course_id = raw_course[0]
@@ -230,6 +277,9 @@ def parse_itc2007_curriculum_based(file_path) -> Problem:
             teachers_to_class_ids[teacher] = class_ids.copy()
         teachers_to_class_ids[teacher] = teachers_to_class_ids[raw_course[1]] + class_ids.copy()
 
+    statistics["teacher_count"] = len(teachers_to_class_ids)
+    statistics["average_lectures_per_teacher"] = statistics["lecture_count"] / len(teachers_to_class_ids)
+
     # HC3 - Lectures of courses in the same curriculum or taught by the same teacher must be all
     # scheduled in different periods
 
@@ -266,16 +316,26 @@ def parse_itc2007_curriculum_based(file_path) -> Problem:
         []
     )
 
-    return problem
+    return problem, statistics
 
 
-def parse_itc2007_post_enrolment(file_path) -> Problem:
+def parse_itc2007_post_enrolment(file_path) -> Tuple[Problem, dict]:
     input_file = open(file_path, "r")
+
+    statistics = {}
 
     daysInTable = 5
     timeslotsPerDay = 9
 
+    statistics["daysInTable"] = daysInTable
+    statistics["timeslotsPerDay"] = timeslotsPerDay
+
     event_count, room_count, feature_count, student_count = [int(x) for x in next(input_file).split()]
+
+    statistics["event_count"] = event_count
+    statistics["room_count"] = room_count
+    statistics["feature_count"] = feature_count
+    statistics["student_count"] = student_count
 
     room_sizes = np.array([int(next(input_file)) for _ in range(room_count)])
 
@@ -396,4 +456,4 @@ def parse_itc2007_post_enrolment(file_path) -> Problem:
         distributions,
         students
     )
-    return problem
+    return problem, statistics
