@@ -121,9 +121,12 @@ def parse_xml(file_path) -> Tuple[Problem, dict]:
         for course in courses_elem.findall("course")
     ]
 
+    stats_all_classes = [clazz for course in courses for config in course.configs for subpart in config.subparts for
+                         clazz in subpart.classes]
+    statistics["used_room_count"] = np.unique(
+        [room_option.id for clazz in stats_all_classes for room_option in clazz.room_options]).size
     statistics["course_count"] = len(courses)
-    statistics["class_count"] = sum(
-        [len(subpart.classes) for course in courses for config in course.configs for subpart in config.subparts])
+    statistics["class_count"] = len(stats_all_classes)
 
     optimization_elem = root.find("optimization")
     optimization = Optimization(
