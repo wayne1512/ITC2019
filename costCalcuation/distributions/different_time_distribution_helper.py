@@ -21,10 +21,12 @@ class DifferentTimeDistributionHelper(BaseDistributionHelper):
         for time_option in checking_class.time_options:
             not_different_time.append(
                 not (
-                        (time_option.start + time_option.length) <= current_time_option.start
-                ) or
-                (
-                        (current_time_option.start + current_time_option.length) <= time_option.start
+                        (
+                                (time_option.start + time_option.length) <= current_time_option.start
+                        ) or
+                        (
+                                (current_time_option.start + current_time_option.length) <= time_option.start
+                        )
                 )
             )
         mask_sub_part_unflattened[:, not_different_time] = 1

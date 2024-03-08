@@ -4,6 +4,7 @@ from xml.etree import ElementTree as ET
 
 import numpy as np
 
+from costCalcuation.distributions.create_distribtion_helper import create_helper_for_distribution
 from models.input.clazz import Clazz
 from models.input.config import Config
 from models.input.course import Course
@@ -152,6 +153,9 @@ def parse_xml(file_path) -> Tuple[Problem, dict]:
     statistics["slotsPerDay"] = int(root.get("slotsPerDay"))
     statistics["nrWeeks"] = int(root.get("nrWeeks"))
 
+    for d in problem.distributions:
+        d.distribution_helper = create_helper_for_distribution(problem, d)
+
     return problem, statistics
 
 
@@ -290,7 +294,7 @@ def parse_itc2007_curriculum_based(file_path) -> Tuple[Problem, dict]:
     # For a given curriculum, we account for a violation every time there is one lecture not adjacent
     # to any other lecture within the same day. Each isolated lecture in a curriculum counts as 2 points of penalty.
 
-    hc3_distributions_teachers = [Distribution("NonOverlap", True, None, class_ids)
+    hc3_distributions_teachers = [Distribution("NotOverlap", True, None, class_ids)
                                   for teacher, class_ids in teachers_to_class_ids.items() if len(class_ids) > 1]
     hc3_distributions_curriculum = []
 
@@ -301,7 +305,7 @@ def parse_itc2007_curriculum_based(file_path) -> Tuple[Problem, dict]:
         class_ids = []
         for course_id in raw_curriculum[2:]:
             class_ids += raw_course_id_to_class_ids[course_id]
-        hc3_distributions_curriculum.append(Distribution("NonOverlap", True, None, class_ids))
+        hc3_distributions_curriculum.append(Distribution("NotOverlap", True, None, class_ids))
         hc3_distributions_curriculum.append(Distribution("ITC2007NotIsolated", False, 2, class_ids))
 
     distributions = (hc3_distributions_teachers + hc3_distributions_curriculum +
@@ -318,6 +322,9 @@ def parse_itc2007_curriculum_based(file_path) -> Tuple[Problem, dict]:
         distributions,
         []
     )
+
+    for d in problem.distributions:
+        d.distribution_helper = create_helper_for_distribution(problem, d)
 
     return problem, statistics
 
@@ -428,7 +435,7 @@ def parse_itc2007_post_enrolment(file_path) -> Tuple[Problem, dict]:
     students = [Student(i, np.argwhere(student_event_matrix[i])[:, 0]) for i in range(student_count)]
 
     # HC1 - No student should be required to attend more than one event at the same time;
-    hc1_distributions = [Distribution("NonOverlap", True, None, s.course_ids) for s in students]
+    hc1_distributions = [Distribution("NotOverlap", True, None, s.course_ids) for s in students]
 
     # HC5 - Where specified, events should be scheduled to occur in the correct order in the week.
     hc5_distributions = [Distribution("Precedence", True, None, [i, j]) for i, j in np.argwhere(before_matrix == 1)]
@@ -459,4 +466,8 @@ def parse_itc2007_post_enrolment(file_path) -> Tuple[Problem, dict]:
         distributions,
         students
     )
+
+    for d in problem.distributions:
+        d.distribution_helper = create_helper_for_distribution(problem, d)
+
     return problem, statistics

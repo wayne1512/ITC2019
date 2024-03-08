@@ -124,6 +124,7 @@ class MaxBlockDistributionHelper:
                                             in_block = True
                                             block_start = si
 
+                                        break_len = 0
                                         last_slot_used_in_block = si
                                     elif in_block:
                                         break_len += 1

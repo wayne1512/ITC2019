@@ -70,13 +70,9 @@ class WorkDaysDistributionHelper(BaseDistributionHelper):
             start = time_option.start
             end = time_option.start + time_option.length
 
-            min_slot_for_each_day[time_option.weeks, time_option.days] = np.where(
-                min_slot_for_each_day[time_option.weeks, time_option.days] <= start,
-                min_slot_for_each_day[time_option.weeks, time_option.days], start)
-
-            max_slot_for_each_day[time_option.weeks, time_option.days] = np.where(
-                max_slot_for_each_day[time_option.weeks, time_option.days] >= end,
-                max_slot_for_each_day[time_option.weeks, time_option.days], end)
+            min_slot_for_each_day[
+                (np.outer(time_option.weeks, time_option.days)) & (min_slot_for_each_day > start)] = start
+            max_slot_for_each_day[(np.outer(time_option.weeks, time_option.days)) & (max_slot_for_each_day < end)] = end
 
         for checking_class in not_placed_classes:
             checking_class_row_index_in_search = solution_search.classes.index(checking_class)
@@ -89,16 +85,12 @@ class WorkDaysDistributionHelper(BaseDistributionHelper):
                 min_copy = np.copy(min_slot_for_each_day)
                 max_copy = np.copy(max_slot_for_each_day)
 
-                min_copy[checking_time_option.weeks, checking_time_option.days] = np.where(
-                    min_copy[checking_time_option.weeks, checking_time_option.days] <= checking_time_option.start,
-                    min_copy[checking_time_option.weeks, checking_time_option.days], checking_time_option.start)
+                min_copy[(np.outer(checking_time_option.weeks, checking_time_option.days))
+                         & (min_copy > checking_time_option.start)] = checking_time_option.start
 
-                max_copy[checking_time_option.weeks, checking_time_option.days] = np.where(
-                    max_copy[
-                        checking_time_option.weeks, checking_time_option.days] >=
-                    checking_time_option.start + checking_time_option.length,
-                    max_copy[checking_time_option.weeks, checking_time_option.days],
-                    checking_time_option.start + checking_time_option.length)
+                max_copy[(np.outer(checking_time_option.weeks, checking_time_option.days))
+                         & (max_copy < checking_time_option.start + checking_time_option.length)] \
+                    = checking_time_option.start + checking_time_option.length
 
                 # ignore min and max values for days were no relevant classes are held
                 min_copy[min_copy == self.problem.slotsPerDay] = 0

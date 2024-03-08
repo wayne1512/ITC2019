@@ -15,7 +15,6 @@ from costCalcuation.distributions.max_breaks_distribution_helper import MaxBreak
 from costCalcuation.distributions.max_day_load_distribution_helper import MaxDayLoadDistributionHelper
 from costCalcuation.distributions.max_days_distribution_helper import MaxDaysDistributionHelper
 from costCalcuation.distributions.min_gap_distribution_helper import MinGapDistributionHelper
-from costCalcuation.distributions.not_implemented_distribution_helper import NotImplementedDistributionHelper
 from costCalcuation.distributions.not_overlap_distribution_helper import NotOverlapDistributionHelper
 from costCalcuation.distributions.overlap_distribution_helper import OverlapDistributionHelper
 from costCalcuation.distributions.precedence_distribution_helper import PrecedenceDistributionHelper
@@ -114,4 +113,4 @@ def create_helper_for_distribution(problem: Problem, distribution: Distribution)
     if match is not None:
         return ITC2007MinDaysDistributionHelper(problem, distribution, int(match.group(1)))
 
-    return NotImplementedDistributionHelper(problem, distribution)
+    raise Exception("Distribution type not implemented: " + dist_type)
