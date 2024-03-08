@@ -236,11 +236,10 @@ fabric.properties
 
 /input.xml
 /input1.xml
-/*.ipynb
 /checkpoint.npy
 /output.xml
 /analysis.p
 /main.p
-/temp.ipynb
 /checkpoints/
 /.idea/other.xml
+/temp/
