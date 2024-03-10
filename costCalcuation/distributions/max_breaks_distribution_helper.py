@@ -100,14 +100,20 @@ class MaxBreaksDistributionHelper:
                                 break_len = 0
 
                                 break_count = 0
+                                break_already_counted = False
 
                                 for s in slots_used_copy[w, d, :]:
                                     if s:
                                         started_day = True
 
-                                        if break_len >= self.break_threshold + 1:
-                                            mask_sub_part_unflattened[:, checking_time_idx] = 1
+                                        if break_len >= self.break_threshold + 1 and not break_already_counted:
+                                            break_count += 1
+                                            break_already_counted = True
+
+                                            if break_count > self.max_breaks:
+                                                mask_sub_part_unflattened[:, checking_time_idx] = 1
 
                                         break_len = 0
                                     elif started_day:
                                         break_len += 1
+                                        break_already_counted = False

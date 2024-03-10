@@ -47,6 +47,9 @@ class DepthFirstSearchSolver:
 
                 current_row -= 1
 
+                if current_row < 0:
+                    raise Exception("Critical failure: Backtracked too much - something is wrong!")
+
                 # append an object to the history of operations array
                 operation_history.append({'current_row': current_row, 'time': time.time() - start_time})
                 backtrack_count += 1

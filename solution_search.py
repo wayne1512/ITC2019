@@ -54,7 +54,7 @@ class SolutionSearch:
 
     def get_options_per_class(self):
         self.options_per_class = [1] * len(self.classes)
-        self.classes_without_rooms = np.empty(len(self.classes))
+        self.classes_without_rooms = np.empty(len(self.classes), dtype=bool)
         for i, c in enumerate(self.classes):
             self.classes_without_rooms[i] = len(c.room_options) == 0
 

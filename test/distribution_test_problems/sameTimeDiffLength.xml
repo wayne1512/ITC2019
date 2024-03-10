@@ -1,0 +1,37 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE problem PUBLIC "-//ITC 2019//DTD Problem Format/EN" "http://www.itc2019.org/competition-format.dtd">
+
+<problem name="agh-fis-spr17" nrDays="7" slotsPerDay="288" nrWeeks="16">
+    <optimization time="4" room="1" distribution="15" student="5"/>
+    <rooms/>
+    <courses>
+        <course id="1">
+            <config id="1">
+                <subpart id="1">
+                    <class id="1" limit="120">
+                        <time days="1000000" start="93" length="18" weeks="1111111010111111" penalty="8"/>
+                    </class>
+                </subpart>
+            </config>
+        </course>
+        <course id="2">
+            <config id="2">
+                <subpart id="2">
+                    <class id="2" limit="120">
+                        <time days="1000000" start="100" length="18" weeks="1111111010111111" penalty="8"/>
+                        <time days="1000000" start="85" length="18" weeks="1111111010111111" penalty="8"/>
+                        <time days="1000000" start="96" length="10" weeks="1111111010111111" penalty="8"/>
+                    </class>
+                </subpart>
+            </config>
+        </course>
+    </courses>
+    <distributions>
+        <distribution type="SameTime" required="true">
+            <class id="1"/>
+            <class id="2"/>
+        </distribution>
+    </distributions>
+    <students>
+    </students>
+</problem>
