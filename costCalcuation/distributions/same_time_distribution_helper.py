@@ -1,4 +1,4 @@
-from costCalcuation.distributions.base_distribution_helper import BaseDistributionHelper
+from costCalcuation.distributions.base_distribution_helper import BaseDistributionHelper, get_room_and_time_chosen
 
 
 class SameTimeDistributionHelper(BaseDistributionHelper):
@@ -36,3 +36,14 @@ class SameTimeDistributionHelper(BaseDistributionHelper):
                 )
             )
         mask_sub_part_unflattened[:, not_same_time] = 1
+
+    def check_ac4_constraints(self, ac4, class_row_i, class_row_j, class_row_i_option, class_row_j_option):
+        time_i = get_room_and_time_chosen(ac4.solution_search, class_row_i, class_row_i_option)[1]
+        time_j = get_room_and_time_chosen(ac4.solution_search, class_row_j, class_row_j_option)[1]
+
+        start_i = time_i.start
+        end_i = time_i.start + time_i.length
+        start_j = time_j.start
+        end_j = time_j.start + time_j.length
+
+        return (start_i <= start_j and end_j <= end_i) or (start_j <= start_i and end_i <= end_j)

@@ -1,6 +1,6 @@
 import numpy as np
 
-from costCalcuation.distributions.base_distribution_helper import BaseDistributionHelper
+from costCalcuation.distributions.base_distribution_helper import BaseDistributionHelper, get_room_and_time_chosen
 
 
 class PrecedenceDistributionHelper(BaseDistributionHelper):
@@ -55,3 +55,28 @@ class PrecedenceDistributionHelper(BaseDistributionHelper):
                 later_class_first_meeting < earlier_class_first_meeting
             )
         mask_sub_part_unflattened[:, not_preceding] = 1
+
+    def check_ac4_constraints(self, ac4, class_row_i, class_row_j, class_row_i_option, class_row_j_option):
+        time_i = get_room_and_time_chosen(ac4.solution_search, class_row_i, class_row_i_option)[1]
+        time_j = get_room_and_time_chosen(ac4.solution_search, class_row_j, class_row_j_option)[1]
+
+        i_id = ac4.solution_search.classes[class_row_i].id
+        j_id = ac4.solution_search.classes[class_row_j].id
+
+        earlier_time, later_time = (time_i, time_j) \
+            if self.distribution.class_ids.index(i_id) < self.distribution.class_ids.index(j_id) \
+            else (time_j, time_i)
+
+        earlier_class_first_meeting = (
+            np.nonzero(earlier_time.weeks)[0][0],
+            np.nonzero(earlier_time.days)[0][0],
+            earlier_time.start + earlier_time.length
+        )
+
+        later_class_first_meeting = (
+            np.nonzero(later_time.weeks)[0][0],
+            np.nonzero(later_time.days)[0][0],
+            later_time.start
+        )
+
+        return later_class_first_meeting >= earlier_class_first_meeting

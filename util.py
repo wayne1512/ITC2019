@@ -1,6 +1,5 @@
 import numpy as np
 
-
 def bool_string_to_bool_arr(s):
     return [bool(int(c)) for c in s]
 

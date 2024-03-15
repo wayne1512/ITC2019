@@ -1,4 +1,4 @@
-from costCalcuation.distributions.base_distribution_helper import BaseDistributionHelper
+from costCalcuation.distributions.base_distribution_helper import BaseDistributionHelper, get_room_and_time_chosen
 from models.input.distribution import Distribution
 
 
@@ -26,3 +26,7 @@ class SameRoomDistributionHelper(BaseDistributionHelper):
         not_same_room = [room_option.id != current_room_option.id
                          for room_option in checking_class.room_options]
         mask_sub_part_unflattened[not_same_room, :] = 1
+
+    def check_ac4_constraints(self, ac4, class_row_i, class_row_j, class_row_i_option, class_row_j_option):
+        return get_room_and_time_chosen(ac4.solution_search, class_row_i, class_row_i_option)[0].id == \
+            get_room_and_time_chosen(ac4.solution_search, class_row_j, class_row_j_option)[0].id
