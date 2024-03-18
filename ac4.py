@@ -62,7 +62,7 @@ class AC4:
                 return False  # if one of the constraints is not satisfied, return False
         return True
 
-    def apply(self):
+    def apply(self, debugLevel=0):
 
         # (class_row_i,class_row_j)->Ac4Constraint[]
 
@@ -78,8 +78,11 @@ class AC4:
                 deletion_stream.append((i, option))
 
         for Vi in range(self.solution_search.decision_table.shape[0]):
+            if debugLevel >= 1:
+                print("initializing AC4 support structures for row: Vi", str(Vi))
             for Vj in range(self.solution_search.decision_table.shape[0]):
-                print("initializing AC4 support structures: Vi", str(Vi), "Vj", str(Vj))
+                if debugLevel >= 2:
+                    print("initializing AC4 support structures: Vi", str(Vi), "Vj", str(Vj))
                 R_Vi_Vj = self.constraints[Vi][Vj]
                 if len(R_Vi_Vj) > 0:
                     for Vi_option in range(self.solution_search.options_per_class[Vi]):
@@ -99,11 +102,15 @@ class AC4:
                         else:
                             self.counter[Vi][Vj][Vi_option] = total
 
+        print("AC4 initialized")
+
         while len(deletion_stream) > 0:
             Vi, Vi_option = deletion_stream.pop()
-            print("closing ", str(Vi), str(Vi_option))
+            if debugLevel >= 1:
+                print("closing ", str(Vi), str(Vi_option))
 
-            print("deletion stream length", str(len(deletion_stream)))
+            if debugLevel >= 2:
+                print("deletion stream length", str(len(deletion_stream)))
 
             for Vj, Vj_option in self.support_set[Vi][Vi_option]:
                 self.counter[Vj][Vi][Vj_option] -= 1

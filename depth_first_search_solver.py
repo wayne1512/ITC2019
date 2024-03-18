@@ -22,7 +22,7 @@ class DepthFirstSearchSolver:
         mask = mask & (self.solution_search.decision_table == 0)
         self.solution_search.decision_table[mask] = (-current_row - 2)  # close
 
-    def solve(self, choose_most_constrained_class=True, max_operations=-1, max_backtracks=-1):
+    def solve(self, debug_level=0, choose_most_constrained_class=True, max_operations=-1, max_backtracks=-1):
 
         operation_count = 0
         backtrack_count = 0
@@ -43,7 +43,8 @@ class DepthFirstSearchSolver:
 
                 # backtrack
                 self.solution_search.decision_table[self.solution_search.decision_table <= (-current_row - 1)] = 0
-                print("backtrack from " + str(current_row) + " to " + str(current_row - 1))
+                if debug_level >= 2:
+                    print("backtrack from " + str(current_row) + " to " + str(current_row - 1))
 
                 current_row -= 1
 
@@ -79,7 +80,10 @@ class DepthFirstSearchSolver:
 
             self.close_downwards_options(current_row, current_option)
 
-            print("proceeded from " + str(current_row) + " to " + str(current_row + 1))
+            if debug_level >= 2:
+                print("proceeded from " + str(current_row) + " to " + str(current_row + 1))
+            elif debug_level >= 1 and current_row % 100 == 0:
+                print(self.solution_search.decision_table)
             current_row += 1
 
             operation_count += 1
