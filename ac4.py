@@ -1,5 +1,4 @@
 import numpy as np
-from memory_profiler import profile
 
 from costCalcuation.distributions.double_booking import DoubleBookingHelper
 from solution_search import SolutionSearch
@@ -63,9 +62,6 @@ class AC4:
                 return False  # if one of the constraints is not satisfied, return False
         return True
 
-    profile_log = open("ac4_memory_profiler.log", "w+")
-
-    @profile(stream=profile_log)  # write the memory profile to a
     def apply(self):
 
         # (class_row_i,class_row_j)->Ac4Constraint[]
