@@ -83,7 +83,7 @@ class DepthFirstSearchSolver:
             if debug_level >= 2:
                 print("proceeded from " + str(current_row) + " to " + str(current_row + 1))
             elif debug_level >= 1 and current_row % 100 == 0:
-                print(self.solution_search.decision_table)
+                print("proceeded from " + str(current_row) + " to " + str(current_row + 1))
             current_row += 1
 
             operation_count += 1
