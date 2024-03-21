@@ -4,6 +4,7 @@ import numpy as np
 import pytest
 from numpy.testing import assert_array_equal
 
+from ac3 import AC3
 from ac4 import AC4
 from depth_first_search_solver import DepthFirstSearchSolver
 from parse_input import parse_xml
@@ -54,7 +55,7 @@ def test_depth_first_solver(problem_dir, problem_file_name, expected_gene):
     assert_array_equal(actual_gene, expected_gene)
 
 
-@pytest.mark.parametrize("problem_file_name, expected_gene", [
+arc_consistency_test_data = [
     ("sameStart.xml", [[-1, 0], [-1, 1]]),
     ("sameTimeEqualLength.xml", [[-1, 0], [-1, 2]]),
     ("sameTimeDiffLength.xml", [[-1, 0], [-1, 2]]),
@@ -78,7 +79,10 @@ def test_depth_first_solver(problem_dir, problem_file_name, expected_gene):
     # ("maxBreaks.xml", [[-1, 0], [-1, 0], [-1, 2]]),
     # ("maxBlock.xml", [[-1, 0], [-1, 0], [-1, 1]]),
     ("doubleBooking.xml", [[0, 0], [0, 1]]),
-])
+]
+
+
+@pytest.mark.parametrize("problem_file_name, expected_gene", arc_consistency_test_data)
 def test_ac4(problem_dir, problem_file_name, expected_gene):
     path = os.path.join(problem_dir, problem_file_name)
 
@@ -88,6 +92,31 @@ def test_ac4(problem_dir, problem_file_name, expected_gene):
 
     ac4 = AC4(search)
     ac4.apply()
+
+    # count 0s in each row to get open options for each class
+    open_options = np.count_nonzero(search.decision_table == 0, axis=1)
+
+    if np.any(open_options > 1):
+        raise ValueError("AC4 did not close all options")
+
+    if np.any(open_options < 1):
+        raise ValueError("AC4 closed too many options")
+
+    search.decision_table[search.decision_table == 0] = 1
+    actual_gene = search.get_result_as_gene()
+    assert_array_equal(actual_gene, expected_gene)
+
+
+@pytest.mark.parametrize("problem_file_name, expected_gene", arc_consistency_test_data)
+def test_ac3(problem_dir, problem_file_name, expected_gene):
+    path = os.path.join(problem_dir, problem_file_name)
+
+    test_problem = parse_xml(path)[0]
+
+    search = SolutionSearch(test_problem)
+
+    ac3 = AC3(search)
+    ac3.apply()
 
     # count 0s in each row to get open options for each class
     open_options = np.count_nonzero(search.decision_table == 0, axis=1)

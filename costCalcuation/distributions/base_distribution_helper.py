@@ -72,7 +72,7 @@ class BaseDistributionHelper(ABC, metaclass=ABCMeta):
         pass
 
     def check_ac4_constraints(self, ac4, class_row_i, class_row_j, class_row_i_option, class_row_j_option):
-        pass
+        return True
 
     def to_ac4_constraints(self):
 
