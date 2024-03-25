@@ -77,3 +77,6 @@ class MaxDayLoadDistributionHelper:
                 sum_extra_loads = np.sum(extra_load_per_day)
                 if sum_extra_loads > 0:
                     mask_sub_part_unflattened[:, checking_time_idx] = 1
+
+    def to_ac4_constraints(self):
+        return []
