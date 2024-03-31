@@ -21,3 +21,7 @@ class ITC2007SameRoomDistributionHelper(BaseDistributionHelper):
     def close_options_for_checking_class(self, current_class, current_room_option, current_time_option, checking_class,
                                          mask_sub_part_unflattened):
         pass
+
+    def check_ac4_constraints(self, ac4, class_row_i, class_row_j, class_row_i_option, class_row_j_option):
+        return ac4.solution_search.classes[class_row_i].room_options[class_row_i_option].id == \
+            ac4.solution_search.classes[class_row_j].room_options[class_row_j_option].id

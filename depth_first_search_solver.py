@@ -22,7 +22,8 @@ class DepthFirstSearchSolver:
         mask = mask & (self.solution_search.decision_table == 0)
         self.solution_search.decision_table[mask] = (-current_row - 2)  # close
 
-    def solve(self, debug_level=0, choose_most_constrained_class=True, max_operations=-1, max_backtracks=-1):
+    def solve(self, debug_level=0, choose_most_constrained_class=True, randomize_option=False, max_operations=-1,
+              max_backtracks=-1):
 
         operation_count = 0
         backtrack_count = 0
@@ -73,8 +74,10 @@ class DepthFirstSearchSolver:
                 self.solution_search.swap_rows(current_row, swap_row)
 
             open_options = np.where(self.solution_search.decision_table[current_row] == 0)[0]
+
+            if randomize_option:
+                np.random.shuffle(open_options)
             current_option = open_options[0]
-            # todo choose random option
 
             self.solution_search.decision_table[current_row, current_option] = 1
 
