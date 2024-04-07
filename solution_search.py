@@ -87,3 +87,11 @@ class SolutionSearch:
         ]
 
         return np.array(arr)
+
+    def __copy__(self):
+        new_search = SolutionSearch(self.problem)
+        new_search.classes = self.classes.copy()
+        new_search.options_per_class = self.options_per_class.copy()
+        new_search.classes_without_rooms = self.classes_without_rooms.copy()
+        new_search.decision_table = self.decision_table.copy()
+        return new_search

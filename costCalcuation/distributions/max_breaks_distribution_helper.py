@@ -90,7 +90,7 @@ class MaxBreaksDistributionHelper:
                 slots_used_copy = slots_used.copy()
 
                 slots_used_copy[checking_time_option.get_timeslots_mask(self.problem.nrWeeks, self.problem.nrDays,
-                                                                   self.problem.slotsPerDay)] = True
+                                                                        self.problem.slotsPerDay)] = True
 
                 for w in range(self.problem.nrWeeks):
                     if checking_time_option.weeks[w]:
@@ -117,3 +117,6 @@ class MaxBreaksDistributionHelper:
                                     elif started_day:
                                         break_len += 1
                                         break_already_counted = False
+
+    def to_ac4_constraints(self):
+        return []

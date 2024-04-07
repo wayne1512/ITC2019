@@ -6,6 +6,7 @@ from numpy.testing import assert_array_equal
 
 from ac3 import AC3
 from ac4 import AC4
+from depth_first_MAC_search_solver import DepthFirstSearchMACSolver
 from depth_first_search_solver import DepthFirstSearchSolver
 from parse_input import parse_xml
 from solution_search import SolutionSearch
@@ -16,7 +17,7 @@ def problem_dir():
     return os.path.join(os.path.dirname(__file__), "distribution_test_problems")
 
 
-@pytest.mark.parametrize("problem_file_name, expected_gene", [
+all_test_data = [
     ("sameStart.xml", [[-1, 0], [-1, 1]]),
     ("sameTimeEqualLength.xml", [[-1, 0], [-1, 2]]),
     ("sameTimeDiffLength.xml", [[-1, 0], [-1, 2]]),
@@ -39,8 +40,11 @@ def problem_dir():
     ("maxDayLoad.xml", [[-1, 0], [-1, 1]]),
     ("maxBreaks.xml", [[-1, 0], [-1, 0], [-1, 2]]),
     ("maxBlock.xml", [[-1, 0], [-1, 0], [-1, 1]]),
-    ("doubleBooking.xml", [[0, 0], [0, 1]]),
-])
+    ("doubleBooking.xml", [[0, 0], [0, 1]])
+]
+
+
+@pytest.mark.parametrize("problem_file_name, expected_gene", all_test_data)
 def test_depth_first_solver(problem_dir, problem_file_name, expected_gene):
     path = os.path.join(problem_dir, problem_file_name)
 
@@ -54,6 +58,20 @@ def test_depth_first_solver(problem_dir, problem_file_name, expected_gene):
 
     assert_array_equal(actual_gene, expected_gene)
 
+
+@pytest.mark.parametrize("problem_file_name, expected_gene", all_test_data)
+def test_depth_first_mac_solver(problem_dir, problem_file_name, expected_gene):
+    path = os.path.join(problem_dir, problem_file_name)
+
+    test_problem = parse_xml(path)[0]
+
+    search = SolutionSearch(test_problem)
+    solver = DepthFirstSearchMACSolver(search)
+    solver.solve()
+
+    actual_gene = search.get_result_as_gene()
+
+    assert_array_equal(actual_gene, expected_gene)
 
 arc_consistency_test_data = [
     ("sameStart.xml", [[-1, 0], [-1, 1]]),

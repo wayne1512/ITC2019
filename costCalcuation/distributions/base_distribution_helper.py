@@ -7,7 +7,7 @@ from solution_search import SolutionSearch
 
 
 def get_room_and_time_chosen(solution_search: SolutionSearch, class_index: int, option_index: int):
-    clazz = solution_search.problem.classes[class_index]
+    clazz = solution_search.classes[class_index]
 
     if len(clazz.room_options) == 0:
         return None, clazz.time_options[option_index]
