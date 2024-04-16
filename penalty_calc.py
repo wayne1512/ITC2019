@@ -1,23 +1,44 @@
 from numpy.typing import NDArray
 
 from costCalcuation.distributions.double_booking import DoubleBookingHelper
+from costCalcuation.distributions.same_attendees_distribution_helper import SameAttendeesDistributionHelper
 from costCalcuation.room_option_penalty import calculate_room_option_penalties, \
     calculate_room_option_penalties_array, calculate_room_option_penalty_for_single_class
 from costCalcuation.time_option_penalty import calculate_time_option_penalties, \
     calculate_time_option_penalties_array, calculate_time_option_penalty_for_single_class
 from costCalcuation.unavailable_room import UnavailableRoomHelper
+from models.input.distribution import Distribution
 from models.input.problem import Problem
 from util import sum_of_costs
 
+
+def calculate_total_cost_including_student_conflicts(problem: Problem, gene: NDArray, student_classes: dict):
+    total_cost = calculate_total_cost(problem, gene)
+    student_conflicts = calculate_student_conflicts(problem, gene, student_classes)
+    return tuple(map(sum, zip(total_cost, student_conflicts)))
+
+
+def calculate_student_conflicts(problem: Problem, gene: NDArray, student_classes: dict):
+    student_violations = (0, 0)
+
+    for s_id, c_ids in student_classes.items():
+        dist = Distribution('SameAttendees', False, 1, c_ids)
+        helper = dist.distribution_helper = SameAttendeesDistributionHelper(problem, dist)
+        count = helper.calculate_clashes(gene[:, 0], gene[:, 1])
+        student_violations = (0, student_violations[1] + count[1])
+
+    return 0, (student_violations[1] * problem.optimization.student)
 
 def calculate_total_cost(problem: Problem, gene: NDArray):
     n = len(problem.classes)
 
     rooms_chosen_idx = gene[:, 0]
     room_penalties = calculate_room_option_penalties(problem.classes, rooms_chosen_idx)
+    room_penalties = (room_penalties[0], room_penalties[1] * problem.optimization.room)
 
     times_chosen_idx = gene[:, 1]
     time_penalties = calculate_time_option_penalties(problem.classes, times_chosen_idx)
+    time_penalties = (time_penalties[0], time_penalties[1] * problem.optimization.time)
 
     double_booking_helper = DoubleBookingHelper(problem)
     double_booking_penalties = double_booking_helper.calculate_clashes(rooms_chosen_idx, times_chosen_idx)
@@ -29,6 +50,7 @@ def calculate_total_cost(problem: Problem, gene: NDArray):
                           problem.distributions]
     distribution_penalties = sum_of_costs(
         dist_penalties_arr)
+    distribution_penalties = (distribution_penalties[0], distribution_penalties[1] * problem.optimization.distribution)
 
     return sum_of_costs(
         [room_penalties, time_penalties, double_booking_penalties, unavailable_room_penalties, distribution_penalties])
@@ -100,7 +122,17 @@ class EditablePenaltyCalculation:
         self.distribution_penalties = distribution_penalties
 
     def calculate_total(self):
-        return sum_of_costs([sum_of_costs(self.room_penalties), sum_of_costs(self.time_penalties),
+        room_penalties_cost = sum_of_costs(self.room_penalties)
+        room_penalties_cost = (room_penalties_cost[0], room_penalties_cost[1] * self.problem.optimization.room)
+
+        time_penalties_cost = sum_of_costs(self.time_penalties)
+        time_penalties_cost = (time_penalties_cost[0], time_penalties_cost[1] * self.problem.optimization.time)
+
+        distribution_penalties_cost = sum_of_costs(self.distribution_penalties)
+        distribution_penalties_cost = (distribution_penalties_cost[0], distribution_penalties_cost[1]
+                                       * self.problem.optimization.distribution)
+
+        return sum_of_costs([room_penalties_cost, time_penalties_cost,
                              (len(self.double_booking_penalties), 0),
                              sum_of_costs(self.unavailable_room_penalties),
-                             sum_of_costs(self.distribution_penalties)])
+                             distribution_penalties_cost])

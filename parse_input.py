@@ -1,5 +1,5 @@
 from collections import Counter
-from typing import Tuple
+from typing import Tuple, List
 from xml.etree import ElementTree as ET
 
 import numpy as np
@@ -159,7 +159,7 @@ def parse_xml(file_path) -> Tuple[Problem, dict]:
     return problem, statistics
 
 
-def parse_itc2007_curriculum_based(file_path) -> Tuple[Problem, dict]:
+def parse_itc2007_curriculum_based(file_path) -> Tuple[Problem, dict, List, List]:
     statistics = {}
 
     input_file = open(file_path, "r")
@@ -203,12 +203,15 @@ def parse_itc2007_curriculum_based(file_path) -> Tuple[Problem, dict]:
     raw_room_id_to_room_id = {}
     rooms = []
 
+    raw_room_ids = []
+
     for i, raw_room in enumerate(raw_rooms):
         raw_room_id = raw_room[0]
         capacity = int(raw_room[1])
         travel_times = []
         unavailabilities = []
         raw_room_id_to_room_id[raw_room_id] = i
+        raw_room_ids.append(raw_room_id)
         rooms.append(Room(i, capacity, travel_times, unavailabilities))
 
     unavailabilities_per_course = {}
@@ -238,6 +241,8 @@ def parse_itc2007_curriculum_based(file_path) -> Tuple[Problem, dict]:
     statistics["lecture_count"] = (np.sum([int(raw_course[2]) for raw_course in raw_courses]))
     statistics["average_lectures_per_course"] = statistics["lecture_count"] / course_count
 
+    raw_course_ids_for_classes = []
+
     for i, raw_course in enumerate(raw_courses):
         course_id = raw_course[0]
         teacher = raw_course[1]
@@ -249,6 +254,9 @@ def parse_itc2007_curriculum_based(file_path) -> Tuple[Problem, dict]:
         classes = []
 
         for j in range(nr_of_lectures):
+
+            raw_course_ids_for_classes.append(course_id)
+
             clazz_id = next_class_id
             next_class_id += 1
             class_ids.append(clazz_id)
@@ -282,7 +290,8 @@ def parse_itc2007_curriculum_based(file_path) -> Tuple[Problem, dict]:
 
         if teacher not in teachers_to_class_ids:
             teachers_to_class_ids[teacher] = class_ids.copy()
-        teachers_to_class_ids[teacher] = teachers_to_class_ids[raw_course[1]] + class_ids.copy()
+        else:
+            teachers_to_class_ids[teacher] = teachers_to_class_ids[raw_course[1]] + class_ids.copy()
 
     statistics["teacher_count"] = len(teachers_to_class_ids)
     statistics["average_lectures_per_teacher"] = statistics["lecture_count"] / len(teachers_to_class_ids)
@@ -306,7 +315,7 @@ def parse_itc2007_curriculum_based(file_path) -> Tuple[Problem, dict]:
         for course_id in raw_curriculum[2:]:
             class_ids += raw_course_id_to_class_ids[course_id]
         hc3_distributions_curriculum.append(Distribution("NotOverlap", True, None, class_ids))
-        hc3_distributions_curriculum.append(Distribution("ITC2007NotIsolated", False, 2, class_ids))
+        sc3_distributions.append(Distribution("ITC2007NotIsolated", False, 2, class_ids))
 
     distributions = (hc3_distributions_teachers + hc3_distributions_curriculum +
                      sc2_distributions + sc3_distributions + sc4_distributions)
@@ -326,7 +335,7 @@ def parse_itc2007_curriculum_based(file_path) -> Tuple[Problem, dict]:
     for d in problem.distributions:
         d.distribution_helper = create_helper_for_distribution(problem, d)
 
-    return problem, statistics
+    return problem, statistics, raw_room_ids, raw_course_ids_for_classes
 
 
 def parse_itc2007_post_enrolment(file_path) -> Tuple[Problem, dict]:
