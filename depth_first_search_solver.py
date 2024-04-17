@@ -60,7 +60,7 @@ class DepthFirstSearchSolver:
                 option_to_close = np.where(self.solution_search.decision_table[current_row] == 1)
                 self.solution_search.decision_table[current_row][option_to_close] = (-current_row - 1)
 
-            if max_backtracks != -1 and backtrack_count > max_backtracks:
+            if max_backtracks != -1 and backtrack_count >= max_backtracks:
                 break  # exceeded number of backtracks allowed - so we stop
 
             if max_operations != -1 and operation_count >= max_operations:
