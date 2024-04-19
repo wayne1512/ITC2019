@@ -35,6 +35,8 @@ def get_gene_maximums(classes: list):
 
 
 def sum_of_costs(n):
+    if len(n) == 0:
+        return 0, 0
     return tuple(np.array(n).sum(0))
 
 
