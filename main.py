@@ -12,6 +12,8 @@ from parse_input import parse_xml
 from timetable_solver import TimetableSolver
 
 
+# only used to test please ignore
+
 def pre_process(problem: Problem):
     def distribution_filter(d):
         return not ((d.penalty == 0 and not d.required) or len(d.class_ids) <= 1)
@@ -105,8 +107,6 @@ if __name__ == "__main__":
         # pre-processing
         pre_process(problem)
 
-        steady_state = settings['steady_state']
-
         population_size = settings['hyperparams']['population_size']
         no_of_generations = settings['hyperparams']['no_of_generations']
 
@@ -118,7 +118,6 @@ if __name__ == "__main__":
         checkpoint_dir = "checkpoints/" + uuid.uuid4().hex + "/"
 
         solver = TimetableSolver(problem,
-                                 steady_state=steady_state,
                                  no_of_generations=no_of_generations,
                                  population_size=population_size,
                                  parent_selection=parent_selection,

@@ -1,3 +1,4 @@
+import numpy as np
 from numpy.typing import NDArray
 
 from costCalcuation.distributions.double_booking import DoubleBookingHelper
@@ -28,6 +29,7 @@ def calculate_student_conflicts(problem: Problem, gene: NDArray, student_classes
         student_violations = (0, student_violations[1] + count[1])
 
     return 0, (student_violations[1] * problem.optimization.student)
+
 
 def calculate_total_cost(problem: Problem, gene: NDArray):
     n = len(problem.classes)
@@ -120,6 +122,31 @@ class EditablePenaltyCalculation:
         self.double_booking_penalties = double_booking_penalties
         self.unavailable_room_penalties = unavailable_room_penalties
         self.distribution_penalties = distribution_penalties
+
+    def blame_class(self, idx, include_room_time_penalties=False):
+        blame_class_id = self.problem.classes[idx].id
+
+        # get the cost attributed to constraints for a single class
+        unavailable_room_penalty = self.unavailable_room_penalties[idx]
+
+        double_booking_violations = (self.double_booking_penalties[
+            np.logical_or(self.double_booking_penalties['class1'] == blame_class_id,
+                          self.double_booking_penalties['class2'] == blame_class_id)
+        ])
+        double_booking_penalty = (len(double_booking_violations), 0)
+
+        distribution_penalty = sum_of_costs([d for i, d in enumerate(self.distribution_penalties) if
+                                             blame_class_id in self.problem.distributions[i].class_ids])
+
+        if include_room_time_penalties:
+            room_penalty = self.room_penalties[idx]
+            time_penalty = self.time_penalties[idx]
+        else:
+            room_penalty = (0, 0)
+            time_penalty = (0, 0)
+
+        return sum_of_costs([room_penalty, time_penalty, double_booking_penalty,
+                             unavailable_room_penalty, distribution_penalty])
 
     def calculate_total(self):
         room_penalties_cost = sum_of_costs(self.room_penalties)
