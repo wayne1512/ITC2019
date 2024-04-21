@@ -108,6 +108,7 @@ class TimetableSolver:
             # Redraw the figure
             self.fig.canvas.draw()
             self.fig.canvas.flush_events()
+            self.fig.savefig(f'{self.graphs_dir}/history.png')
             plt.pause(0.01)
 
             # Update the fitness plot

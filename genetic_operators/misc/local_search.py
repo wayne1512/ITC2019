@@ -107,25 +107,25 @@ def local_search(gene: NDArray, max_gene, problem, max_moves=10000, graph_dir=No
                     class_moved = True
                     break
 
-        # N3 - change of room and time
-        if not class_moved:
-            for j in range(max_gene[i, 0]):
-                for k in range(max_gene[i, 1]):
-                    new_gene = gene.copy()
-                    new_gene[i, 0] = (gene[i, 0] + 1 + j) % (max_gene[i, 0] + 1)
-                    new_gene[i, 1] = (gene[i, 1] + 1 + k) % (max_gene[i, 1] + 1)
-
-                    new_gene_editable_cost = edit_cost(editable_cost, new_gene, [i])
-                    new_gene_cost = new_gene_editable_cost.calculate_total()
-
-                    if new_gene_cost[0] < cost[0]:
-                        gene = new_gene.copy()
-                        editable_cost = new_gene_editable_cost
-                        cost = new_gene_cost
-                        class_moved = True
-                        break
-                if class_moved:
-                    break
+        # # N3 - change of room and time
+        # if not class_moved:
+        #     for j in range(max_gene[i, 0]):
+        #         for k in range(max_gene[i, 1]):
+        #             new_gene = gene.copy()
+        #             new_gene[i, 0] = (gene[i, 0] + 1 + j) % (max_gene[i, 0] + 1)
+        #             new_gene[i, 1] = (gene[i, 1] + 1 + k) % (max_gene[i, 1] + 1)
+        #
+        #             new_gene_editable_cost = edit_cost(editable_cost, new_gene, [i])
+        #             new_gene_cost = new_gene_editable_cost.calculate_total()
+        #
+        #             if new_gene_cost[0] < cost[0]:
+        #                 gene = new_gene.copy()
+        #                 editable_cost = new_gene_editable_cost
+        #                 cost = new_gene_cost
+        #                 class_moved = True
+        #                 break
+        #         if class_moved:
+        #             break
 
         if class_moved:
             class_count = 0
@@ -185,25 +185,25 @@ def local_search(gene: NDArray, max_gene, problem, max_moves=10000, graph_dir=No
                         class_moved = True
                         break
 
-            # N3 - change of room and time
-            if not class_moved:
-                for j in range(max_gene[i, 0]):
-                    for k in range(max_gene[i, 1]):
-                        new_gene = gene.copy()
-                        new_gene[i, 0] = (gene[i, 0] + 1 + j) % (max_gene[i, 0] + 1)
-                        new_gene[i, 1] = (gene[i, 1] + 1 + k) % (max_gene[i, 1] + 1)
-
-                        new_gene_editable_cost = edit_cost(editable_cost, new_gene, [i])
-                        new_gene_cost = new_gene_editable_cost.calculate_total()
-
-                        if new_gene_cost < cost:
-                            gene = new_gene.copy()
-                            editable_cost = new_gene_editable_cost
-                            cost = new_gene_cost
-                            class_moved = True
-                            break
-                    if class_moved:
-                        break
+            # # N3 - change of room and time
+            # if not class_moved:
+            #     for j in range(max_gene[i, 0]):
+            #         for k in range(max_gene[i, 1]):
+            #             new_gene = gene.copy()
+            #             new_gene[i, 0] = (gene[i, 0] + 1 + j) % (max_gene[i, 0] + 1)
+            #             new_gene[i, 1] = (gene[i, 1] + 1 + k) % (max_gene[i, 1] + 1)
+            #
+            #             new_gene_editable_cost = edit_cost(editable_cost, new_gene, [i])
+            #             new_gene_cost = new_gene_editable_cost.calculate_total()
+            #
+            #             if new_gene_cost < cost:
+            #                 gene = new_gene.copy()
+            #                 editable_cost = new_gene_editable_cost
+            #                 cost = new_gene_cost
+            #                 class_moved = True
+            #                 break
+            #         if class_moved:
+            #             break
 
             if class_moved:
                 class_count = 0
