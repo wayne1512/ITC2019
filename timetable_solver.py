@@ -9,7 +9,7 @@ from checkpoint_manager import CheckpointManager
 from depth_first_search_solver import DepthFirstSearchSolver
 from genetic_operators.crossover import UniformCrossover
 from genetic_operators.misc.local_search import local_search
-from genetic_operators.mutation.uniform_mutation import UniformMutation
+from genetic_operators.mutation.move_mutation import MoveMutation
 from genetic_operators.parent_selection import get_parent_selection_method
 from penalty_calc import calculate_total_cost
 from solution_search import SolutionSearch
@@ -24,6 +24,7 @@ class TimetableSolver:
                  first_population_method="random",
                  parent_selection="tournament",
                  mutation_chance=0.001,
+                 crossover_chance=1,
                  crossover_ratio=0.1,
                  checkpoint_dir=None,
                  graphs_dir=None,
@@ -35,6 +36,7 @@ class TimetableSolver:
         self.first_population_method = first_population_method
         self.parent_selection = get_parent_selection_method(parent_selection)
         self.mutation_chance = mutation_chance
+        self.crossover_chance = crossover_chance
         self.crossover_ratio = crossover_ratio
         self.local_search = local_search
 
@@ -47,7 +49,7 @@ class TimetableSolver:
 
         self.init_population_construction_times = []
 
-        self.mutation = UniformMutation(mutation_chance)
+        self.mutation = MoveMutation(mutation_chance)
         self.crossover = UniformCrossover(crossover_ratio)
 
         self.generation = 0
@@ -79,7 +81,7 @@ class TimetableSolver:
         self.start_time = time.time() - self.total_time_elapsed  # if we recovered from a checkpoint, we need to
         # consider the time elapsed before the checkpoint
 
-        while self.generation < self.no_of_generations:
+        while self.generation <= self.no_of_generations:
             if self.population is None:
                 if not self.generate_first_population():
                     return
@@ -172,10 +174,14 @@ class TimetableSolver:
 
         selected_parents_indices = self.parent_selection.select(np.array(self.costs), 1)[0]
 
-        child = self.crossover.crossover(
-            self.population[selected_parents_indices[0]], self.population[selected_parents_indices[1]])[0]
+        if np.random.rand() <= self.crossover_chance:
+            child = self.crossover.crossover(
+                self.population[selected_parents_indices[0]], self.population[selected_parents_indices[1]])[0]
+        else:
+            child = self.population[selected_parents_indices[0]].copy()
 
-        child = self.mutation.mutate(child, self.maximum_genes)
+        if np.random.rand() <= self.mutation_chance:
+            child = self.mutation.mutate(child, self.maximum_genes)
 
         if self.local_search is not None and self.local_search:
             child, cost_of_child = local_search(child, self.maximum_genes, self.problem,
