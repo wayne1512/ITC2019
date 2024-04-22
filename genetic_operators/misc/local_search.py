@@ -50,7 +50,7 @@ def plot_stats_graph(graph_dir, move_history):
     move_history.to_csv(f'{graph_dir}/move_history.csv', index=True)
 
 
-def local_search(gene: NDArray, max_gene, problem, max_moves=10000, graph_dir=None):
+def local_search(gene: NDArray, max_gene, problem, max_moves=10000, graph_dir=None, max_time=1800):
     move_history = pd.DataFrame(columns=['hard_cost', 'soft_cost', 'time'])
     start_time = time.time()
 
@@ -63,7 +63,7 @@ def local_search(gene: NDArray, max_gene, problem, max_moves=10000, graph_dir=No
 
     class_count = 0
     i = 0
-    while class_count < len(gene):
+    while class_count < len(gene) and time.time() - start_time < max_time:
 
         class_moved = False
 
@@ -145,7 +145,7 @@ def local_search(gene: NDArray, max_gene, problem, max_moves=10000, graph_dir=No
 
         class_count = 0
         i = 0
-        while class_count < len(gene):
+        while class_count < len(gene) and time.time() - start_time < max_time:
 
             class_moved = False
 
