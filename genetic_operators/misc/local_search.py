@@ -1,9 +1,15 @@
 import os
 import time
 
+import matplotlib
 import pandas as pd
 from matplotlib import pyplot as plt
+
+matplotlib.use('agg')  # https://github.com/matplotlib/matplotlib/issues/20067#issuecomment-827158382
+
+
 from numpy._typing import NDArray
+
 
 from penalty_calc import calculate_editable_cost, edit_cost
 
@@ -135,7 +141,7 @@ def local_search(gene: NDArray, max_gene, problem, max_moves=10000, graph_dir=No
 
             if moves_done >= max_moves:
                 break
-            print(f"Class {i} was moved making the new cost: {cost}")
+            # print(f"Class {i} was moved making the new cost: {cost}")
 
     if cost[0] > 0:
         print(f"Local search ended with {cost[0]} hard constraints not satisfied")
@@ -213,6 +219,6 @@ def local_search(gene: NDArray, max_gene, problem, max_moves=10000, graph_dir=No
 
                 if moves_done >= max_moves:
                     break
-                print(f"Class {i} was moved making the new cost: {cost}")
+                #print(f"Class {i} was moved making the new cost: {cost}")
     plot_stats_graph(graph_dir, move_history)
     return gene, cost
