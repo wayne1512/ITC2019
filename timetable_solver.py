@@ -8,6 +8,7 @@ from matplotlib import pyplot as plt
 from checkpoint_manager import CheckpointManager
 from depth_first_search_solver import DepthFirstSearchSolver
 from genetic_operators.crossover import UniformCrossover
+from genetic_operators.misc.iterated_local_search import iterated_local_search
 from genetic_operators.misc.local_search import local_search
 from genetic_operators.mutation.move_mutation import MoveMutation
 from genetic_operators.parent_selection import get_parent_selection_method
@@ -29,7 +30,9 @@ class TimetableSolver:
                  checkpoint_dir=None,
                  graphs_dir=None,
                  graphs_interval=100,
-                 local_search=False):
+                 local_search=False,
+                 iterated_local_search=False
+                 ):
         self.problem = problem
         self.no_of_generations = no_of_generations
         self.population_size = population_size
@@ -39,6 +42,7 @@ class TimetableSolver:
         self.crossover_chance = crossover_chance
         self.crossover_ratio = crossover_ratio
         self.local_search = local_search
+        self.iterated_local_search = iterated_local_search
 
         self.checkpoint_dir = checkpoint_dir
         self.checkpoint_manager = CheckpointManager(checkpoint_dir)
@@ -187,6 +191,13 @@ class TimetableSolver:
             child, cost_of_child = local_search(child, self.maximum_genes, self.problem,
                                                 graph_dir=
                                                 os.path.join(self.graphs_dir, f"local_search_{self.generation}"))
+
+        if self.iterated_local_search is not None and self.iterated_local_search:
+            child, cost_of_child = iterated_local_search(child, self.maximum_genes, self.problem,
+                                                         graph_dir=
+                                                         os.path.join(self.graphs_dir,
+                                                                      f"iterated_local_search_{self.generation}"))
+
         cost_of_child = calculate_total_cost(self.problem, child)
 
         worst_cost_index = np.lexsort((np.array(self.costs)[:, 1], np.array(self.costs)[:, 0]))[-1]
