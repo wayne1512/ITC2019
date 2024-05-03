@@ -141,7 +141,7 @@ class TimetableSolver:
             genes = []
             times = []
 
-            max_attempts_before_first_success = 2
+            max_attempts_before_first_success = 5
             max_attempts = 200
             failed_attempts = 0
 

@@ -16,7 +16,7 @@ from penalty_calc import calculate_editable_cost
 
 
 def plot_stats_graph(graph_dir, move_history):
-    os.mkdir(graph_dir)
+    os.makedirs(graph_dir, exist_ok=True)
 
     fig = plt.figure()  # over time
     # Plot hard_cost subplot in red
@@ -61,7 +61,12 @@ def perturbation(gene: NDArray, max_gene, problem, editable_cost):
     for k in range(10):
         chosen_row = np.random.randint(0, len(gene))
         chosen_element = np.random.randint(0, 2)  # will we change the room or time?
-        chosen_value = np.random.randint(0, max_gene[chosen_row, chosen_element])
+
+        if max_gene[chosen_row, chosen_element] <= 0:
+            chosen_value = 0
+        else:
+            chosen_value = np.random.randint(0, max_gene[chosen_row, chosen_element])
+
         gene[chosen_row, chosen_element] = chosen_value
 
     return gene

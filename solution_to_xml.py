@@ -37,6 +37,21 @@ def generate_xml(problem: Problem, gene, student_classes: dict, file_path="outpu
     tree.write(open(file_path, 'wb'))
 
 
+def output_itc2007_post(problem: Problem, gene, file_path="output.sol"):
+    f = open(file_path, "w+")
+
+    for c, r, t in zip(problem.classes, gene[:, 0], gene[:, 1]):
+        to_chosen: TimeOption = c.time_options[t]
+        chosen_weekday = np.where(to_chosen.days)[0][0]
+        chosen_slot = to_chosen.start
+
+        ro_chosen = c.room_options[r]
+        room_id = ro_chosen.id
+
+        slot_name = chosen_weekday * 9 + chosen_slot
+
+        f.write(f"{slot_name},{room_id}\n")
+
 def output_itc2007_cb(problem: Problem, gene, raw_room_ids, raw_course_ids_for_classes, file_path="output.sol"):
     f = open(file_path, "w+")
 
