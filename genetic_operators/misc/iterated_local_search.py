@@ -63,9 +63,9 @@ def perturbation(gene: NDArray, max_gene, problem, editable_cost):
         chosen_element = np.random.randint(0, 2)  # will we change the room or time?
 
         if max_gene[chosen_row, chosen_element] <= 0:
-            chosen_value = 0
+            chosen_value = max_gene[chosen_row, chosen_element]
         else:
-            chosen_value = np.random.randint(0, max_gene[chosen_row, chosen_element])
+            chosen_value = np.random.randint(0, max_gene[chosen_row, chosen_element] + 1)
 
         gene[chosen_row, chosen_element] = chosen_value
 

@@ -15,7 +15,7 @@ from penalty_calc import calculate_editable_cost, edit_cost
 
 
 def plot_stats_graph(graph_dir, move_history):
-    os.mkdir(graph_dir)
+    os.makedirs(graph_dir, exist_ok=True)
 
     fig = plt.figure()  # over time
     # Plot hard_cost subplot in red
