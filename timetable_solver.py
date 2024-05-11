@@ -1,5 +1,6 @@
 import os
 import time
+from collections import defaultdict
 
 import numpy as np
 import pandas as pd
@@ -12,7 +13,7 @@ from genetic_operators.misc.iterated_local_search import iterated_local_search
 from genetic_operators.misc.local_search import local_search
 from genetic_operators.mutation.move_mutation import MoveMutation
 from genetic_operators.parent_selection import get_parent_selection_method
-from penalty_calc import calculate_total_cost
+from penalty_calc import calculate_total_cost, calculate_editable_cost
 from solution_search import SolutionSearch
 from util import get_gene_maximums, random_gene
 
@@ -31,7 +32,8 @@ class TimetableSolver:
                  graphs_dir=None,
                  graphs_interval=100,
                  local_search=False,
-                 iterated_local_search=False
+                 iterated_local_search=False,
+                 guided_search=False,
                  ):
         self.problem = problem
         self.no_of_generations = no_of_generations
@@ -43,6 +45,7 @@ class TimetableSolver:
         self.crossover_ratio = crossover_ratio
         self.local_search = local_search
         self.iterated_local_search = iterated_local_search
+        self.guided_search = guided_search
 
         self.checkpoint_dir = checkpoint_dir
         self.checkpoint_manager = CheckpointManager(checkpoint_dir)
@@ -80,6 +83,11 @@ class TimetableSolver:
         self.fitness_ax_hard.legend(loc='upper left')
         self.fitness_ax_soft.legend(loc='upper right')
 
+        self.mem = None
+        self.best_individuals_size = None
+        self.mem_construction_interval = 20
+        self.classes_from_mem = None
+
     def run(self):
 
         self.start_time = time.time() - self.total_time_elapsed  # if we recovered from a checkpoint, we need to
@@ -94,6 +102,9 @@ class TimetableSolver:
 
             if self.generation % self.graphs_interval == 0 or self.generation == self.no_of_generations - 1:
                 self.update_graphs()
+
+            if self.guided_search and self.generation % self.mem_construction_interval == 0:
+                self.construct_mem()
 
             self.generation += 1
             self.total_time_elapsed = time.time() - self.start_time
@@ -181,6 +192,8 @@ class TimetableSolver:
         if np.random.rand() <= self.crossover_chance:
             child = self.crossover.crossover(
                 self.population[selected_parents_indices[0]], self.population[selected_parents_indices[1]])[0]
+        elif self.guided_search:
+            child = self.generate_mem_child()
         else:
             child = self.population[selected_parents_indices[0]].copy()
 
@@ -209,6 +222,48 @@ class TimetableSolver:
                                           pd.DataFrame([[self.generation, cost_of_child[0], cost_of_child[1],
                                                          time.time() - self.start_time]],
                                                        columns=['generation', 'hard_cost', 'soft_cost', 'time'])])
+
+    def generate_mem_child(self):
+
+        child = np.zeros_like(self.population[0])
+
+        self.classes_from_mem = int(0.6 * self.population[0].shape[0])
+
+        mem_classes_idx = np.random.choice(self.population[0].shape[0], self.classes_from_mem, replace=False)
+
+        rand_gene = random_gene(self.maximum_genes)
+
+        for c_idx in range(self.population[0].shape[0]):
+            if c_idx in mem_classes_idx:
+                if len(self.mem[c_idx]) == 0:
+                    child[c_idx] = rand_gene[c_idx]
+                else:
+                    child[c_idx] = self.mem[c_idx][np.random.choice(len(self.mem[c_idx]))]
+            else:
+                child[c_idx] = rand_gene[c_idx]
+
+        return child
+
+    def construct_mem(self):
+        self.mem = defaultdict(list)
+
+        self.best_individuals_size = int(.2 * self.population_size)
+
+        best_individuals = np.lexsort((np.array(self.costs)[:, 1], np.array(self.costs)[:, 0]))[
+                           :self.best_individuals_size]
+
+        for idx in range(self.best_individuals_size):
+            i = self.population[best_individuals[idx]]
+
+            editable_cost = calculate_editable_cost(self.problem, i)
+
+            for c_idx in range(len(i)):
+                cost_of_class = editable_cost.blame_class(c_idx, include_room_time_penalties=True)
+
+                if cost_of_class[0] == 0:
+                    self.mem[c_idx].append(i[c_idx])  # place room,time in the proper slot in mem
+
+
 
     def get_best_solution(self):
         if self.costs is None:
