@@ -1,6 +1,6 @@
 import numpy as np
 
-from costCalcuation.distributions.base_distribution_helper import BaseDistributionHelper
+from costCalcuation.distributions.base_distribution_helper import BaseDistributionHelper, get_room_and_time_chosen
 from models.input.distribution import Distribution
 
 
@@ -32,3 +32,12 @@ class SameDaysDistributionHelper(BaseDistributionHelper):
                 not (np.array_equal(days_or, current_time_option.days) or np.array_equal(days_or, time_option.days))
             )
         mask_sub_part_unflattened[:, not_same_days] = 1
+
+    def check_ac4_constraints(self, ac4, class_row_i, class_row_j, class_row_i_option, class_row_j_option):
+
+        days_i = get_room_and_time_chosen(ac4.solution_search, class_row_i, class_row_i_option)[1].days
+        days_j = get_room_and_time_chosen(ac4.solution_search, class_row_j, class_row_j_option)[1].days
+
+        days_or = np.logical_or(days_i, days_j)
+
+        return np.array_equal(days_or, days_i) or np.array_equal(days_or, days_j)

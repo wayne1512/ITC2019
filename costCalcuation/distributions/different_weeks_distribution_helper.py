@@ -1,6 +1,6 @@
 import numpy as np
 
-from costCalcuation.distributions.base_distribution_helper import BaseDistributionHelper
+from costCalcuation.distributions.base_distribution_helper import BaseDistributionHelper, get_room_and_time_chosen
 from models.input.distribution import Distribution
 
 
@@ -27,3 +27,9 @@ class DifferentWeeksDistributionHelper(BaseDistributionHelper):
         not_different_weeks = [np.any(np.logical_and(time_option.weeks, current_time_option.weeks)) for time_option in
                                checking_class.time_options]
         mask_sub_part_unflattened[:, not_different_weeks] = 1
+
+    def check_ac4_constraints(self, ac4, class_row_i, class_row_j, class_row_i_option, class_row_j_option):
+        return not np.any(np.logical_and(
+            get_room_and_time_chosen(ac4.solution_search, class_row_i, class_row_i_option)[1].weeks,
+            get_room_and_time_chosen(ac4.solution_search, class_row_j, class_row_j_option)[1].weeks)
+        )

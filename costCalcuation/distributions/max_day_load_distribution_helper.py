@@ -18,8 +18,8 @@ class MaxDayLoadDistributionHelper:
 
         for time_option in time_options_chosen:
             day_loads[np.outer(time_option.weeks, time_option.days)] = (
-                        day_loads[np.outer(time_option.weeks, time_option.days)]
-                        + time_option.length)
+                    day_loads[np.outer(time_option.weeks, time_option.days)]
+                    + time_option.length)
 
         extra_load_per_day = np.maximum(day_loads - self.max_load, 0)
         sum_extra_loads = np.sum(extra_load_per_day)
@@ -58,9 +58,7 @@ class MaxDayLoadDistributionHelper:
 
         day_loads = np.zeros((self.problem.nrWeeks, self.problem.nrDays), dtype=int)
         for time_option in already_placed_time_options:
-            day_loads[np.outer(time_option.weeks, time_option.days)] = day_loads[np.outer(time_option.weeks,
-                                                                                          time_option.days)] \
-                                                                       + time_option.length
+            day_loads[np.outer(time_option.weeks, time_option.days)] += time_option.length
 
         for checking_class in not_placed_classes:
             checking_class_row_index_in_search = solution_search.classes.index(checking_class)
@@ -72,11 +70,13 @@ class MaxDayLoadDistributionHelper:
             for checking_time_idx, checking_time_option in enumerate(checking_class.time_options):
                 day_loads_copy = day_loads.copy()
 
-                day_loads_copy[checking_time_option.weeks, checking_time_option.days] = (
-                        day_loads_copy[checking_time_option.weeks, checking_time_option.days]
-                        + checking_time_option.length)
+                day_loads_copy[
+                    np.outer(checking_time_option.weeks, checking_time_option.days)] += checking_time_option.length
 
                 extra_load_per_day = np.maximum(day_loads_copy - self.max_load, 0)
                 sum_extra_loads = np.sum(extra_load_per_day)
                 if sum_extra_loads > 0:
                     mask_sub_part_unflattened[:, checking_time_idx] = 1
+
+    def to_ac4_constraints(self):
+        return []

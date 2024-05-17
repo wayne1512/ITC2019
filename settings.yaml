@@ -1,10 +1,10 @@
-input: 'D:\Downloads\assignmentRedownload\instances\early\muni-fi-spr16.xml'
-solid_state: true
+input: 'D:\Desktop\Datasets\2019\early\agh-fis-spr17.xml'
+steady_state: true
 hyperparams:
-  population_size: 32
-  no_of_generations: 100
+  population_size: 512
+  no_of_generations: 1000000000
   parent_selection: roulette
   mutation_chance: 0.005
-  crossover_ratio: 0.01
+  crossover_ratio: 0.3
 
 

@@ -1,0 +1,45 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE problem PUBLIC "-//ITC 2019//DTD Problem Format/EN" "http://www.itc2019.org/competition-format.dtd">
+
+<problem name="agh-fis-spr17" nrDays="7" slotsPerDay="288" nrWeeks="16">
+    <optimization time="4" room="1" distribution="15" student="5"/>
+    <rooms>
+        <room id="1" capacity="300">
+            <travel room="2" value="10"/>
+        </room>
+        <room id="2" capacity="300"/>
+    </rooms>
+    <courses>
+        <course id="1">
+            <config id="1">
+                <subpart id="1">
+                    <class id="1" limit="120">
+                        <time days="1000000" start="90" length="20" weeks="1111111010111111" penalty="8"/>
+                        <room id="1" penalty="11"/>
+                    </class>
+                </subpart>
+            </config>
+        </course>
+        <course id="2">
+            <config id="2">
+                <subpart id="2">
+                    <class id="2" limit="120">
+                        <time days="1000000" start="90" length="20" weeks="1111111010111111" penalty="8"/>
+                        <time days="1000000" start="65" length="20" weeks="1111111010111111" penalty="8"/>
+                        <time days="1000000" start="115" length="20" weeks="1111111010111111" penalty="8"/>
+                        <time days="1000000" start="130" length="20" weeks="1111111010111111" penalty="8"/>
+                        <room id="2" penalty="11"/>
+                    </class>
+                </subpart>
+            </config>
+        </course>
+    </courses>
+    <distributions>
+        <distribution type="SameAttendees" required="true">
+            <class id="1"/>
+            <class id="2"/>
+        </distribution>
+    </distributions>
+    <students>
+    </students>
+</problem>

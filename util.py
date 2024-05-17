@@ -1,6 +1,5 @@
 import numpy as np
 
-
 def bool_string_to_bool_arr(s):
     return [bool(int(c)) for c in s]
 
@@ -20,22 +19,8 @@ def extract_class_list(problem):
     return classes
 
 
-def random_gene(maximums, problem=None):
+def random_gene(maximums):
     r = (np.random.rand(*maximums.shape) * (maximums + 1)).astype(int)
-
-    if problem is not None:
-        for i, c in enumerate(problem.classes):
-
-            if c.is_fixed():
-                r[i] = (0, 0)
-                continue
-
-            # is not none handles classes with no rooms
-            while c.closed_room_time_combinations is not None and \
-                    c.closed_room_time_combinations[r[i, 0], r[i, 1]]:
-                # if the current room time combination is closed, choose a new one
-                r[i] = (np.random.rand() * (maximums[i] + 1)).astype(int)
-
     r = np.where(maximums < 0, -1, r)
     return r
 
@@ -50,6 +35,8 @@ def get_gene_maximums(classes: list):
 
 
 def sum_of_costs(n):
+    if len(n) == 0:
+        return 0, 0
     return tuple(np.array(n).sum(0))
 
 

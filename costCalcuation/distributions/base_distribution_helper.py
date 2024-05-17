@@ -3,8 +3,19 @@ from abc import ABC, ABCMeta, abstractmethod
 import numpy as np
 
 from models.input.distribution import Distribution
+from solution_search import SolutionSearch
 
 
+def get_room_and_time_chosen(solution_search: SolutionSearch, class_index: int, option_index: int):
+    clazz = solution_search.classes[class_index]
+
+    if len(clazz.room_options) == 0:
+        return None, clazz.time_options[option_index]
+
+    current_room_option_idx, current_time_option_idx = \
+        np.unravel_index(option_index, (len(clazz.room_options), len(clazz.time_options)))
+
+    return clazz.room_options[current_room_option_idx], clazz.time_options[current_time_option_idx]
 class BaseDistributionHelper(ABC, metaclass=ABCMeta):
 
     def __init__(self, problem, distribution: Distribution):
@@ -59,3 +70,17 @@ class BaseDistributionHelper(ABC, metaclass=ABCMeta):
     def close_options_for_checking_class(self, current_class, current_room_option, current_time_option, checking_class,
                                          mask_sub_part_unflattened):
         pass
+
+    def check_ac4_constraints(self, ac4, class_row_i, class_row_j, class_row_i_option, class_row_j_option):
+        return True
+
+    def to_ac4_constraints(self):
+
+        arr = []
+
+        for i, i_id in enumerate(self.distribution.class_ids):
+            for j, j_id in enumerate(self.distribution.class_ids):
+                if i != j:
+                    arr.append((i_id, j_id, self.check_ac4_constraints))
+
+        return arr

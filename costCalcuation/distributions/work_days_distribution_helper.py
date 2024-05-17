@@ -70,13 +70,11 @@ class WorkDaysDistributionHelper(BaseDistributionHelper):
             start = time_option.start
             end = time_option.start + time_option.length
 
-            min_slot_for_each_day[time_option.weeks, time_option.days] = np.where(
-                min_slot_for_each_day[time_option.weeks, time_option.days] <= start,
-                min_slot_for_each_day[time_option.weeks, time_option.days], start)
+            min_slot_for_each_day[
+                (np.outer(time_option.weeks, time_option.days)) & (min_slot_for_each_day > start)] = start
+            max_slot_for_each_day[(np.outer(time_option.weeks, time_option.days)) & (max_slot_for_each_day < end)] = end
 
-            max_slot_for_each_day[time_option.weeks, time_option.days] = np.where(
-                max_slot_for_each_day[time_option.weeks, time_option.days] >= end,
-                max_slot_for_each_day[time_option.weeks, time_option.days], end)
+        work_day_for_already_placed = max_slot_for_each_day - min_slot_for_each_day
 
         for checking_class in not_placed_classes:
             checking_class_row_index_in_search = solution_search.classes.index(checking_class)
@@ -89,23 +87,26 @@ class WorkDaysDistributionHelper(BaseDistributionHelper):
                 min_copy = np.copy(min_slot_for_each_day)
                 max_copy = np.copy(max_slot_for_each_day)
 
-                min_copy[checking_time_option.weeks, checking_time_option.days] = np.where(
-                    min_copy[checking_time_option.weeks, checking_time_option.days] <= checking_time_option.start,
-                    min_copy[checking_time_option.weeks, checking_time_option.days], checking_time_option.start)
+                min_copy[(np.outer(checking_time_option.weeks, checking_time_option.days))
+                         & (min_copy > checking_time_option.start)] = checking_time_option.start
 
-                max_copy[checking_time_option.weeks, checking_time_option.days] = np.where(
-                    max_copy[
-                        checking_time_option.weeks, checking_time_option.days] >=
-                    checking_time_option.start + checking_time_option.length,
-                    max_copy[checking_time_option.weeks, checking_time_option.days],
-                    checking_time_option.start + checking_time_option.length)
+                max_copy[(np.outer(checking_time_option.weeks, checking_time_option.days))
+                         & (max_copy < checking_time_option.start + checking_time_option.length)] \
+                    = checking_time_option.start + checking_time_option.length
+
+                # check which days were changed
+                changed_days = np.logical_or(min_copy != min_slot_for_each_day, max_copy != max_slot_for_each_day)
 
                 # ignore min and max values for days were no relevant classes are held
                 min_copy[min_copy == self.problem.slotsPerDay] = 0
                 max_copy[max_copy == -1] = 0
 
-                work_day = max_copy - min_copy
-                violated_max_work_day = np.max(work_day) > self.maxTimeSlots
+                work_days = max_copy - min_copy
 
-                if violated_max_work_day:
+                # if a day has not changed, then it is NOT a violation
+                # this can be caused by a single already placed class which is greater than the max
+                # allowed work day
+                violated_max_work_day = (work_days > self.maxTimeSlots) & changed_days
+
+                if np.any(violated_max_work_day):
                     mask_sub_part_unflattened[:, checking_time_idx] = 1

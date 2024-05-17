@@ -1,6 +1,6 @@
 import numpy as np
 
-from costCalcuation.distributions.base_distribution_helper import BaseDistributionHelper
+from costCalcuation.distributions.base_distribution_helper import BaseDistributionHelper, get_room_and_time_chosen
 from models.input.distribution import Distribution
 
 
@@ -78,3 +78,19 @@ class MinGapDistributionHelper(BaseDistributionHelper):
                                 checking_time_option.start)
                     ):
                         mask_sub_part_unflattened[:, checking_time_idx] = 1
+
+    def check_ac4_constraints(self, ac4, class_row_i, class_row_j, class_row_i_option, class_row_j_option):
+        time_i = get_room_and_time_chosen(ac4.solution_search, class_row_i, class_row_i_option)[1]
+        time_j = get_room_and_time_chosen(ac4.solution_search, class_row_j, class_row_j_option)[1]
+
+        start_i = time_i.start
+        end_i = time_i.start + time_i.length
+        start_j = time_j.start
+        end_j = time_j.start + time_j.length
+
+        return (
+                not np.any(np.logical_and(time_i.days, time_j.days))
+                or not np.any(np.logical_and(time_i.weeks, time_j.weeks))
+                or (end_i + self.min_gap) <= start_j
+                or (end_j + self.min_gap) <= start_i
+        )

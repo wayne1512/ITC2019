@@ -62,7 +62,7 @@ def analyze_subinstances():
 # Print the list of XML files
 for xml_file in xml_files:
     print(xml_file)
-    problem = parse_xml(xml_file)
+    problem = parse_xml(xml_file)[0]
 
     fixed_classes = []
     for c in problem.classes:

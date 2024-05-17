@@ -1,6 +1,6 @@
 import numpy as np
 
-from costCalcuation.distributions.base_distribution_helper import BaseDistributionHelper
+from costCalcuation.distributions.base_distribution_helper import BaseDistributionHelper, get_room_and_time_chosen
 from models.input.distribution import Distribution
 
 
@@ -67,3 +67,21 @@ class SameAttendeesDistributionHelper(BaseDistributionHelper):
                 )
             unfeasible.append(unfeasible_in_current_room)
         mask_sub_part_unflattened[unfeasible] = 1
+
+    def check_ac4_constraints(self, ac4, class_row_i, class_row_j, class_row_i_option, class_row_j_option):
+        room_i, time_i = get_room_and_time_chosen(ac4.solution_search, class_row_i, class_row_i_option)
+        room_j, time_j = get_room_and_time_chosen(ac4.solution_search, class_row_j, class_row_j_option)
+
+        start_i = time_i.start
+        end_i = time_i.start + time_i.length
+        start_j = time_j.start
+        end_j = time_j.start + time_j.length
+
+        min_gap = self.problem.get_travel_time(room_i.id, room_j.id) if room_i is not None and room_j is not None else 0
+
+        return (
+                not np.any(np.logical_and(time_i.days, time_j.days))
+                or not np.any(np.logical_and(time_i.weeks, time_j.weeks))
+                or (end_i + min_gap) <= start_j
+                or (end_j + min_gap) <= start_i
+        )

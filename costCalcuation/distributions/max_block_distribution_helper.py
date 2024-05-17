@@ -124,6 +124,7 @@ class MaxBlockDistributionHelper:
                                             in_block = True
                                             block_start = si
 
+                                        break_len = 0
                                         last_slot_used_in_block = si
                                     elif in_block:
                                         break_len += 1
@@ -139,3 +140,6 @@ class MaxBlockDistributionHelper:
                                             slots_used_copy[w, d, block_start] != slots_used_copy[
                                                 w, d, last_slot_used_in_block]):
                                         mask_sub_part_unflattened[:, checking_time_idx] = 1
+
+    def to_ac4_constraints(self):
+        return []

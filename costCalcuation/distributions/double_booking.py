@@ -1,6 +1,8 @@
 import numpy as np
 import pandas as pd
 
+from costCalcuation.distributions.base_distribution_helper import get_room_and_time_chosen
+
 
 class DoubleBookingHelper:
 
@@ -210,3 +212,35 @@ class DoubleBookingHelper:
                 mask_sub_part_unflattened = mask_sub_part.reshape((-1, len(checking_class.time_options)))
                 self.close_options_for_checking_class(current_class, current_room_option, current_time_option,
                                                       checking_class, mask_sub_part_unflattened)
+
+    def to_ac4_constraints(self):
+
+        arr = []
+
+        for i in self.problem.classes:
+            for j in self.problem.classes:
+                if i != j:
+                    arr.append((i.id, j.id, self.check_ac4_constraints))
+
+        return arr
+
+    def check_ac4_constraints(self, ac4, class_row_i, class_row_j, class_row_i_option, class_row_j_option):
+        room_and_time_i = get_room_and_time_chosen(ac4.solution_search, class_row_i, class_row_i_option)
+        room_and_time_j = get_room_and_time_chosen(ac4.solution_search, class_row_j, class_row_j_option)
+
+        room_i = room_and_time_i[0]
+        room_j = room_and_time_j[0]
+
+        time_i = room_and_time_i[1]
+        time_j = room_and_time_j[1]
+
+        return (
+                room_i is None
+                or room_j is None
+                or room_i.id != room_j.id
+                or (time_j.start + time_j.length) <= time_i.start
+                or (time_i.start + time_i.length) <= time_j.start
+                or not np.any(np.logical_and(time_i.days, time_j.days))
+                or not np.any(np.logical_and(time_i.weeks, time_j.weeks))
+
+        )

@@ -1,6 +1,6 @@
 import numpy as np
 
-from costCalcuation.distributions.base_distribution_helper import BaseDistributionHelper
+from costCalcuation.distributions.base_distribution_helper import BaseDistributionHelper, get_room_and_time_chosen
 from models.input.distribution import Distribution
 
 
@@ -42,3 +42,15 @@ class OverlapDistributionHelper(BaseDistributionHelper):
                 )
             )
         mask_sub_part_unflattened[:, not_overlap] = 1
+
+    def check_ac4_constraints(self, ac4, class_row_i, class_row_j, class_row_i_option, class_row_j_option):
+        time_i = get_room_and_time_chosen(ac4.solution_search, class_row_i, class_row_i_option)[1]
+        time_j = get_room_and_time_chosen(ac4.solution_search, class_row_j, class_row_j_option)[1]
+
+        return (
+                time_i.start < (time_j.start + time_j.length)
+                and
+                time_j.start < (time_i.start + time_i.length)
+                and np.any(np.logical_and(time_i.days, time_j.days))
+                and np.any(np.logical_and(time_i.weeks, time_j.weeks))
+        )
