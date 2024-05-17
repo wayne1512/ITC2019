@@ -20,6 +20,12 @@ GSGA) and student sectioning for the ITC2019 datasets.
 These jupyter notebooks were used as a common base for the experiments, and although they serve as a good demonstration
 on running the algorithm, they are not necessary to run the algorithm.
 
+When running the scripts, ensure that the datasets are placed in the 'Datasets' folder at the root of the project. and
+that a folder called 'output' exists in the root of the project.
+
+The Datasets folder should contain 3 subfolders called '2019','post', and 'curriculum', containing the instances for the
+ITC2019, ITC2007 track2, and ITC2007 track3 datasets respectively.
+
 ## Other files
 
 'experiment_analysis' folder contained the notebooks required to analyze the results of the experiments.
