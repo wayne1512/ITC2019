@@ -1,8 +1,17 @@
 # Code for "A Metaheuristic approach to the University course timetabling problem"
 
+## Installation
+
+run `python -m venv ./venv` to create a virtual environment
+
+run '.\venv\Scripts\activate' to activate the virtual environment
+
+run `pip install -r requirements.txt` to install the required packages
+
 ## Quick start
 
-'parse_input.py' contains functions to parse the input data from the .txt files in the 'data' folder. The 'data' folder
+'parse_input.py' contains functions to parse the input data from the files in the 'Datasets' folder. The 'Datasets'
+folder
 contains the input data from the ITC2007 track2, ITC2007 track3 and ITC2019 datasets.
 
 'timetable_solver'.py contains the main implementation of the algorithm.
